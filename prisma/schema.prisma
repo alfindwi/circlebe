@@ -1,0 +1,96 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             Int       @id @default(autoincrement())
+  email          String    @unique
+  fullName       String
+  username       String?
+  image          String?
+  passwordUsers  String?
+  bio            String?
+  socialConnection SocialConnection?
+  role           RoleEnum  @default(MEMBER)
+  thread          Thread[]
+  following      Follow[] @relation("Following")
+  followers      Follow[] @relation("Followers")
+  replies          Reply[] 
+  SuggestionsGiven  Suggestion[]  @relation("SuggestionsGiven")
+  SuggestionsReceived Suggestion[] @relation("SuggestionsReceived")
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+
+model Thread {
+  id        Int      @id @default(autoincrement())
+  content   String
+  image     String?
+  likesCount Int    @default(0)
+  repliesCount Int @default(0)
+  replies   Reply []
+  user User @relation(fields: [userId], references: [id])
+  userId    Int
+  
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+model Reply {
+  id        Int      @id @default(autoincrement())
+  content   String
+  image     String?
+  user      User   @relation(fields: [userId], references: [id])
+  userId    Int
+  likes     Int @default(0)
+  thread    Thread @relation(fields: [threadId], references: [id])
+  threadId Int
+
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+model Follow {
+  id          Int    @id @default(autoincrement())
+  follower    User   @relation("Following", fields: [followerId], references: [id])
+  followerId  Int @default(0)
+  following   User   @relation("Followers", fields: [followingId], references: [id])
+  followingId Int @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+model Suggestion {
+  id          Int    @id @default(autoincrement())
+  suggestedBy User   @relation("SuggestionsGiven", fields: [suggestedById], references: [id])
+  suggestedById Int
+  suggestedTo  User   @relation("SuggestionsReceived", fields: [suggestedToId], references: [id])
+  suggestedToId Int
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+
+enum RoleEnum {
+  ADMIN
+  MEMBER
+}
+
+enum SocialConnection {
+  GOOGLE
+  GITHUB
+  FACEBOOK
+}
+
