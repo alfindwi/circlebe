@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import userService from "../services/user-service";
 import { customError, customErrorCode } from "../types/error";
 import { createUserScehma , updateUserScehma} from "../utils/schema/users-schema";
+import cloudinaryService from "../services/cloudinary-service";
 
 class UserController {
     
@@ -18,15 +19,12 @@ class UserController {
         try {
             const { id } = req.params;
     
-            // Validasi ID apakah number atau tidak
             if (isNaN(Number(id))) {
                 return res.status(400).json({ message: "Invalid user ID" });
             }
     
-            // Ambil user berdasarkan ID
             const user = await userService.getUserById(Number(id));
     
-            // Jika user tidak ditemukan
             if (!user) {
                 return res.status(404).json({ message: "User not found" });
             }
@@ -57,7 +55,17 @@ class UserController {
     }
 
     async create (req: Request, res: Response) {
-        
+        /*  #swagger.requestBody = {
+            required: true,
+            content: {
+                "multipart/form-data": {
+                    schema: {
+                        $ref: "#/components/schemas/CreateUserDTO"
+                    }  
+                }
+            }
+        } 
+    */
         try {
             const {error, value} = await createUserScehma.validate(req.body, {abortEarly: false});
 
@@ -74,26 +82,46 @@ class UserController {
     }
 
     async update(req: Request, res: Response) {
+        /*  #swagger.requestBody = {
+            required: true,
+            content: {
+                "multipart/form-data": {
+                    schema: {
+                        $ref: "#/components/schemas/updateUserDTO"
+                    }  
+                }
+            }
+        } 
+        */
         try {
             const userId = Number(req.params.id);
-    
+            
             if (!userId) {
                 return res.status(400).json({ message: "User ID is required" });
             }
-            
-            const { error, value } = await updateUserScehma.validate(req.body, { abortEarly: false });
     
-            if (error) {
-                const errorMessage = error.details.map(detail => detail.message);
-                return res.status(400).json({ message: errorMessage });
+            if (!req.file) {
+                return res.status(400).json({ message: "Image file is required" });
             }
     
+            const image = await cloudinaryService.uploadSingle(req.file as Express.Multer.File);
+
+            const body = {
+                ...req.body,
+                image: image.secure_url, 
+            };
+    
+            const value = await updateUserScehma.validateAsync(body);
+    
             const users = await userService.updateUser(userId, value);
+            
             res.json(users);
         } catch (error) {
-            res.status(500).json(error);
+            res.status(500).json({ message: "An error occurred", error });
         }
     }
+    
+    
     
 
     async delete(req: Request, res: Response) {

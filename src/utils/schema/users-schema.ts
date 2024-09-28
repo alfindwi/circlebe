@@ -7,13 +7,13 @@ export const createUserScehma = Joi.object<createUsersDTO>({
     passwordUsers: Joi.string().min(6),
     username: Joi.string().required().min(5).max(255),
     bio: Joi.string(),
-    image: Joi.string().allow(null).optional()
+    image: Joi.string()
 })
 
 export const updateUserScehma = Joi.object<createUsersDTO>({
     fullName: Joi.string().required().min(5).max(255),
     username: Joi.string().required().min(5).max(255),
     bio: Joi.string(),
-    image: Joi.string().allow(null).optional()
+    image: Joi.string()
 })
 

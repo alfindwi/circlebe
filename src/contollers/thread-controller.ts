@@ -50,8 +50,6 @@ class ThreadController {
           const user = (req as any).user;
           const image = await cloudinaryService.uploadSingle((req.file as Express.Multer.File));
           
-          console.log("image", image)
-
           const body = {
             ...req.body,
             image: image.secure_url
@@ -68,7 +66,7 @@ class ThreadController {
         /*  #swagger.requestBody = {
             required: true,
             content: {
-                "application/json": {
+                "multipart/form-data": {
                     schema: {
                         $ref: "#/components/schemas/UpdateThreadDTO"
                     }  
@@ -78,6 +76,7 @@ class ThreadController {
     */
         try {
             const thread = await threadService.updateThread(req.body);
+            
             res.json(thread);
           } catch (error) {
             res.status(500).json(error);

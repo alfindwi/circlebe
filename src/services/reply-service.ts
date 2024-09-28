@@ -1,13 +1,17 @@
 import { PrismaClient, Reply, Thread } from "@prisma/client"
 import { customError, customErrorCode } from "../types/error"
 import { CreateThreadDTO } from "../dto/thread-dto"
-import { ReplyDTO } from "../dto/reply-dto"
+import { createReplyDTO } from "../dto/reply-dto"
 
 const prisma = new PrismaClient()
 
 class replyService{
      async getAllReply() : Promise<Reply[]> {
-      const reply = await prisma.reply.findMany()
+      const reply = await prisma.reply.findMany({
+        include: {
+          user: true,
+        },
+      })
 
       if(!reply) {
         throw {
@@ -19,40 +23,54 @@ class replyService{
         return reply
     }
 
-    async createReply(reply: Omit<ReplyDTO, 'id' | 'createdAt' | 'updatedAt'>): Promise<Reply> {
-      try {
-        // Ensure the thread exists
-        const threadExists = await prisma.thread.findUnique({
-          where: { id: reply.threadId },
-        });
-        if (!threadExists) {
-          throw new Error(`Thread with ID ${reply.threadId} does not exist.`);
-        }
-    
-        // Ensure the user exists
-        const userExists = await prisma.user.findUnique({
-          where: { id: reply.userId },
-        });
-        if (!userExists) {
-          throw new Error(`User with ID ${reply.userId} does not exist.`);
-        }
-    
-        // Create reply record
-        const newReply = await prisma.reply.create({
-          data: {
-            content: reply.content,
-            image: reply.image,
-            likes: reply.likes,
-            threadId: reply.threadId,
-            userId: reply.userId,
-          },
-        });
-        return newReply;
-      } catch (error) {
-        console.error('Error creating reply:', error);
-        throw error;
+    async createReply(data: createReplyDTO): Promise<Reply> {
+      const threadId = Number(data.threadId); 
+  
+      const threadExists = await prisma.thread.findUnique({
+          where: { id: threadId },
+      });
+  
+      if (!threadExists) {
+          throw {
+              code: customErrorCode.THREAD_NOT_EXIST,
+              message: 'Thread not found!',
+              status: 404,
+          } as customError;
       }
+  
+      const newReply = await prisma.reply.create({
+          data: {
+              content: data.content,
+              image: data.image,
+              userId: data.userId,
+              threadId: threadId,
+              likes: 0,
+          },
+      });
+  
+      return newReply;
     }
+
+    async getRepliesByThreadId(threadId: number): Promise<Reply[]> {
+      try {
+          const replies = await prisma.reply.findMany({
+            where: { threadId: threadId },
+            include: { user: true },
+          });
+          
+          return replies;
+      } catch (error) {
+          console.error("Prisma query error:", error); 
+          throw new Error("Error fetching replies from database");
+      }
+  }
+  
+
+    
+    
+  
+  
+  
     
       
 }

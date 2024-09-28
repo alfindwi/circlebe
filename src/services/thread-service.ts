@@ -24,7 +24,7 @@ class threadService{
           throw {
               status: 404,
               message: "Thread not found!",
-              code: customErrorCode.USERS_NOT_EXIST
+              code: customErrorCode.THREAD_NOT_EXIST
           } as customError
       }
       return thread 
@@ -72,7 +72,7 @@ class threadService{
   
       return await prisma.thread.update({
         data: thread,
-        where: { id: 2 },
+        where: { id: data.id },
       });
     }
 

@@ -21,6 +21,25 @@ const doc = {
   ],
   components: {
     "@schemas": {
+      CreateReplyDTO: {
+        type: "object",
+        properties: {
+            content: {
+                type: "string",
+            },
+            image: {
+                type: "string",
+                format: "binary", 
+            },
+            threadId: {
+                type: "integer", 
+            },
+            userId: {
+                type: "integer",
+            },
+        },
+        required: ["content", "threadId", "userId"],
+    },
       CreateThreadDTO: {
         type: "object",
         properties: {
@@ -42,9 +61,41 @@ const doc = {
           },
           image: {
             type: "string",
+            format: "binary"
           },
         },
         required: ["content"],
+      },
+      createUserDTO: {
+        type: "object",
+        properties: {
+          content: {
+            type: "string",
+          },
+          image: {
+            type: "string",
+          },
+        },
+        required: ["content"],
+      },
+      updateUserDTO: {
+        type: "object",
+        properties: {
+          fullName: {
+            type: "string",
+          },
+          username: {
+            type: "string",
+          },
+          bio: {
+            type: "string",
+          },
+          image: {
+            type: "string",
+            format: "binary"
+          },
+        },
+        required: ["fullName"],
       },
       LoginDTO: {
         type: "object",

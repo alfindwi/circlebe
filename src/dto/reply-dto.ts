@@ -1,11 +1,7 @@
-export interface ReplyDTO {
-    id: number;
+export interface createReplyDTO {
     content: string;
-    image?: string | null;
-    likes: number;
+    image?: string; 
+    likes?: number; 
     threadId: number;
-    userId: number; 
-    createdAt: Date;
-    updatedAt: Date;
+    userId: number;
 }
-  

@@ -92,16 +92,26 @@ class userService{
               code: customErrorCode.USERS_NOT_EXIST,
           } as customError;
       }
+
+      if (data.fullName) {
+        user.fullName = data.fullName;
+      }
+
+      if (data.username) {
+        user.username = data.username;
+      }
+
+      if (data.bio) {
+        user.bio = data.bio;
+      }
+  
+      if (data.image) {
+        user.image = data.image;
+      }
   
       return await prisma.user.update({
+          data: user,
           where: { id: userId },
-          data: {
-              fullName: data.fullName || user.fullName,
-              username: data.username || user.username,
-              passwordUsers: data.passwordUsers || user.passwordUsers,
-              image: data.image || user.image,
-              bio: data.bio || user.bio,
-          },
       });
   }
   

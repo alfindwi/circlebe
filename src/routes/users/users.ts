@@ -16,7 +16,7 @@ routerV1.get("/users", userController.find)
 routerV1.get("/users/:id", userController.findById)
 routerV1.get("/users/email/:email", userController.findByEmail)
 routerV1.post("/users",userController.create)
-routerV1.patch("/users/:id", userController.update);
+routerV1.patch("/users/:id",authentication, upload.single("image") , userController.update);
 routerV1.delete("/users/:id", userController.delete)
 
 routerV1.post("/auth/login", authController.login)
@@ -42,6 +42,7 @@ routerV1.post("/follow", followController.postFollow)
 routerV1.get("/suggestion/:userId", suggestionController.getSuggestions)
 
 
-routerV1.get("/replies", replyController.findReply)
-routerV1.post("/replies", replyController.createReply)
+routerV1.get("/replies",authentication, replyController.findReply)
+routerV1.get("/replies/:id",authentication, replyController.getRepliesByThreadId)
+routerV1.post("/replies",authentication, upload.single("image") , replyController.createReply)
 
