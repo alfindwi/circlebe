@@ -54,6 +54,19 @@ class UserController {
         }
     }
 
+    async findByFullname (req: Request, res: Response) {
+        try {
+            const fullName: string = req.params.fullName;
+        const users = await userService.getUserByfullName(fullName);
+        res.json({
+            data: users,
+            message: "success search by fullName"
+        });
+        } catch (error) {
+           res.status(500).json(error)
+        }
+    }
+
     async create (req: Request, res: Response) {
         /*  #swagger.requestBody = {
             required: true,

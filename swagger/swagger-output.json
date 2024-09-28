@@ -188,6 +188,29 @@
         }
       }
     },
+    "/api/v1/users/fullName/{fullName}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "fullName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
     "/api/v1/auth/login": {
       "post": {
         "description": "",

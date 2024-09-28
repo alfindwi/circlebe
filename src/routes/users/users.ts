@@ -15,6 +15,7 @@ export const routerV1 = express.Router();
 routerV1.get("/users", userController.find)
 routerV1.get("/users/:id", userController.findById)
 routerV1.get("/users/email/:email", userController.findByEmail)
+routerV1.get("/users/fullName/:fullName", userController.findByFullname)
 routerV1.post("/users",userController.create)
 routerV1.patch("/users/:id",authentication, upload.single("image") , userController.update);
 routerV1.delete("/users/:id", userController.delete)
