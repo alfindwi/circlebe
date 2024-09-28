@@ -1,44 +1,36 @@
-import { Follow, PrismaClient } from "@prisma/client";
-import { FollowDTO } from "../dto/follow-dto";
-import { customError, customErrorCode } from "../types/error";
+import { PrismaClient, Follow } from "@prisma/client";
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
-class followService {
-  async getAllFollow(): Promise<Follow[]> {
-    try {
-      const follows = await prisma.follow.findMany();
-
-      if (follows.length === 0) {
-        throw {
-          status: 404,
-          message: "No follows found!",
-          code: customErrorCode.FOLLOW_NOT_EXIST,
-        } as customError;
-      }
-
-      return follows;
-    } catch (error) {
-      console.error('Error getting all follows:', error);
-      throw error;
-    }
-  }
-
-  async createFollow(follow: Omit<FollowDTO, 'id' | 'createdAt' | 'updatedAt'>) {
-    try {
-      const newFollow = await prisma.follow.create({
-        data: {
-          followerId: follow.followerId,
-          followingId: follow.followingId,
+class FollowService {
+  // Mengembalikan array yang berisi data follower tanpa menggunakan FollowDTO
+  async getFollowersByUserId(userId: number): Promise<any[]> { // Sesuaikan tipe return sesuai kebutuhan Anda
+    const followers = await prisma.follow.findMany({
+      where: {
+        followingId: userId, // Pastikan userId sudah bertipe number
+      },
+      include: {
+        follower: {
+          select: {
+            id: true,
+            fullName: true,
+            username: true,
+            bio: true,
+            image: true,
+          },
         },
-      });
-      return newFollow;
-    } catch (error) {
-      console.error('Error creating follow:', error);
-      throw error;
-    }
+      },
+    });
+
+    // Mapping ke objek yang diinginkan
+    return followers.map(follow => ({
+      id: follow.follower.id,
+      fullName: follow.follower.fullName,
+      username: follow.follower.username,
+      bio: follow.follower.bio,
+      image: follow.follower.image,
+    }));
   }
 }
 
-
-export default new followService()
+export default new FollowService();

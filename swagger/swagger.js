@@ -34,11 +34,8 @@ const doc = {
             threadId: {
                 type: "integer", 
             },
-            userId: {
-                type: "integer",
-            },
         },
-        required: ["content", "threadId", "userId"],
+        required: ["content", "threadId"],
     },
       CreateThreadDTO: {
         type: "object",

@@ -29,7 +29,6 @@ class UserController {
                 return res.status(404).json({ message: "User not found" });
             }
     
-            // Berhasil menemukan user
             res.json({
                 data: user,
                 message: "Success search by ID",

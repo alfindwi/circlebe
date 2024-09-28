@@ -25,7 +25,7 @@ class userService{
               where: { id },
           });
   
-          return user; // Akan mengembalikan user atau null jika tidak ditemukan
+          return user;
       } catch (error) {
           console.error("Error in getUserById service:", error);
           throw new Error("Failed to fetch user by ID");

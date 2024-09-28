@@ -21,11 +21,13 @@ model User {
   image          String?
   passwordUsers  String?
   bio            String?
+  followingId   Int?
+  followersId   Int?
   socialConnection SocialConnection?
   role           RoleEnum  @default(MEMBER)
   thread          Thread[]
-  following      Follow[] @relation("Following")
-  followers      Follow[] @relation("Followers")
+  Following      Follow[] @relation("Following")
+  Followers     Follow[] @relation("Followers")
   replies          Reply[] 
   SuggestionsGiven  Suggestion[]  @relation("SuggestionsGiven")
   SuggestionsReceived Suggestion[] @relation("SuggestionsReceived")
@@ -43,7 +45,6 @@ model Thread {
   replies   Reply []
   user User @relation(fields: [userId], references: [id])
   userId    Int
-  
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 }
@@ -64,10 +65,10 @@ model Reply {
 
 model Follow {
   id          Int    @id @default(autoincrement())
-  follower    User   @relation("Following", fields: [followerId], references: [id])
   followerId  Int @default(0)
-  following   User   @relation("Followers", fields: [followingId], references: [id])
   followingId Int @default(0)
+  follower    User   @relation("Following", fields: [followerId], references: [id])
+  following   User   @relation("Followers", fields: [followingId], references: [id])
   createdAt   DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 }

@@ -16,22 +16,63 @@ class ThreadController {
         } catch (error) {
           res.status(500).json(error);
         }
-      }
+    }
     
 
-    async findById (req: Request, res: Response) {
+    async findById(req: Request, res: Response) {
         try {
-            const {id} = req.params
+            const { id } = req.params;
+            const thread = await threadService.getThreadById(Number(id));
 
-        const thread = await threadService.getThreadById(Number(id));
-        res.json({
-            data: thread,
-            message: "success search by Id"
-        });  
+            res.json({
+                data: thread,
+                message: "Success search by Id",
+            });
         } catch (error) {
-            res.status(500).json(error) 
+            res.status(500).json({ message: (error as Error).message });
         }
     }
+
+    // Menambahkan balasan (reply) ke sebuah thread
+    async addReply(req: Request, res: Response) {
+        try {
+            const { threadId } = req.params;
+            const replyData = req.body;
+            const reply = await threadService.addReplyToThread(Number(threadId), replyData);
+
+            res.status(201).json({
+                data: reply,
+                message: "Reply added successfully",
+            });
+        } catch (error) {
+            res.status(500).json({ message: (error as Error).message });
+        }
+    }
+    
+
+    async findThreadByUserId(req: Request, res: Response) {
+        try {
+            const { userId } = req.params;
+    
+            if (!userId) {
+                return res.status(400).json({ message: "User ID is required" });
+            }
+    
+            const thread = await threadService.getThreadsByUserId(Number(userId));
+    
+            console.log("Thread found:", thread); 
+    
+            return res.json({
+                data: thread,
+                message: "Success search by Id"
+            });
+        } catch (error) {
+            console.error("Error in findThreadByUserId:", error); 
+            return res.status(500).json({ message: "Internal server error" });
+        }
+    }
+    
+    
 
     async create(req: Request, res: Response) {
         /*  #swagger.requestBody = {

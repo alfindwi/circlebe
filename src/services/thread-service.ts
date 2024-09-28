@@ -13,22 +13,60 @@ class threadService{
     });
   }
 
-    async getThreadById(id : number) : Promise<Thread | null>{
-      const thread = await prisma.thread.findUnique({
-        where: {
-          id: id,
-      }
-      })
+  async getThreadById(id: number) {
+    const thread = await prisma.thread.findUnique({
+        where: { id },
+        include: {
+            user: true, 
+            replies: true, 
+        },
+    });
 
-      if(!thread) {
-          throw {
-              status: 404,
-              message: "Thread not found!",
-              code: customErrorCode.THREAD_NOT_EXIST
-          } as customError
-      }
-      return thread 
+    if (!thread) {
+        throw new Error("Thread not found");
+    }
+
+    return thread;
+}
+
+async addReplyToThread(threadId: number, replyData: any) {
+    const reply = await prisma.reply.create({
+        data: {
+            ...replyData,
+            threadId: threadId,
+        },
+    });
+
+    await prisma.thread.update({
+        where: { id: threadId },
+        data: {
+            repliesCount: {
+                increment: 1,
+            },
+        },
+    });
+
+    return reply;
   }
+
+
+    async getThreadsByUserId(userId: number): Promise<Thread[]> {
+      try {
+          const threads = await prisma.thread.findMany({
+              where: { userId : userId },
+              include: { user: true },
+          });
+  
+          return threads;
+      } catch (error) {
+          console.error("Prisma query error:", error);
+          throw new Error("Error fetching threads from the database");
+      }
+    }
+    
+  
+  
+
 
   async createThread(data: CreateThreadDTO, user: User): Promise<Thread | null> {
     if (!user) {

@@ -47,6 +47,15 @@ class replyService{
               likes: 0,
           },
       });
+
+      await prisma.thread.update({
+          where: { id: threadId },
+          data: {
+              repliesCount: {
+                  increment: 1,
+              },
+          },
+      })
   
       return newReply;
     }
@@ -64,14 +73,6 @@ class replyService{
           throw new Error("Error fetching replies from database");
       }
   }
-  
-
-    
-    
-  
-  
-  
-    
       
 }
 
