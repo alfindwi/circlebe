@@ -41,6 +41,19 @@ const doc = {
           }
         },
       },      
+      UnfollowRequest: {
+        type: "object",
+        properties: {
+          followingId: {
+            type: "integer",
+            description: "Id yang akan berhenti diikuti"
+          },
+          followerId: {
+            type: "integer",
+            description: "Id yang ingin diikuti"
+          }
+        },
+      },     
       CreateReplyDTO: {
         type: "object",
         properties: {

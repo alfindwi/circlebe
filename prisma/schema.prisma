@@ -21,8 +21,6 @@ model User {
   image          String?
   passwordUsers  String?
   bio            String?
-  followingId   Int?
-  followersId   Int?
   socialConnection SocialConnection?
   role           RoleEnum  @default(MEMBER)
   thread          Thread[]

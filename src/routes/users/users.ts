@@ -42,6 +42,7 @@ routerV1.delete("/thread/:id",authentication, threadController.delete)
 routerV1.get("/followers/:userId", followController.getFollowers);
 routerV1.get("/following/:userId", followController.getFollowing);
 routerV1.post("/follow", authentication, followController.followUser);
+routerV1.post("/unfollow", authentication, followController.unfollowUser);
 
 // routerV1.get("/suggestion/:userId", suggestionController.getSuggestions)
 
