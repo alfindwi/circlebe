@@ -1,4 +1,4 @@
-export interface FollowDTO {
+export interface CreateFollowDTO {
     id: number;
     followerId: number;
     followingId: number;

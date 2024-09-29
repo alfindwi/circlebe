@@ -512,34 +512,37 @@
         ]
       }
     },
-    "/api/v1/follow": {
-      "get": {
+    "/api/v1/threads/{threadId}/like": {
+      "post": {
         "description": "",
+        "parameters": [
+          {
+            "name": "threadId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
-          },
-          "500": {
-            "description": "Internal Server Error"
           }
-        }
-      },
-      "post": {
-        "description": "",
-        "responses": {
-          "201": {
-            "description": "Created"
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "500": {
-            "description": "Internal Server Error"
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/AddThreadLikeDTO"
+              }
+            }
           }
         }
       }
     },
-    "/api/v1/suggestion/{userId}": {
+    "/api/v1/followers/{userId}": {
       "get": {
         "description": "",
         "parameters": [
@@ -556,11 +559,71 @@
           "200": {
             "description": "OK"
           },
-          "400": {
-            "description": "Bad Request"
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/v1/following/{userId}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
           },
           "500": {
             "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/v1/follow": {
+      "post": {
+        "description": "",
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "409": {
+            "description": "Conflict"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFollowDTO"
+              }
+            }
           }
         }
       }
@@ -655,6 +718,29 @@
       }
     },
     "schemas": {
+      "AddThreadLikeDTO": {
+        "type": "object",
+        "properties": {
+          "threadId": {
+            "type": "integer"
+          },
+          "userId": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "threadId",
+          "userId"
+        ]
+      },
+      "CreateFollowDTO": {
+        "type": "object",
+        "properties": {
+          "followingId": {
+            "type": "integer"
+          }
+        }
+      },
       "CreateReplyDTO": {
         "type": "object",
         "properties": {

@@ -33,20 +33,23 @@ class ThreadController {
         }
     }
 
-    // Menambahkan balasan (reply) ke sebuah thread
-    async addReply(req: Request, res: Response) {
-        try {
-            const { threadId } = req.params;
-            const replyData = req.body;
-            const reply = await threadService.addReplyToThread(Number(threadId), replyData);
 
-            res.status(201).json({
-                data: reply,
-                message: "Reply added successfully",
-            });
-        } catch (error) {
-            res.status(500).json({ message: (error as Error).message });
-        }
+    async addLike(req: Request, res: Response) {
+        /*  #swagger.requestBody = {
+                required: true,
+                content: {
+                    "multipart/form-data": {
+                        schema: {
+                            $ref: "#/components/schemas/AddThreadLikeDTO"
+                        }  
+                    }
+                }
+            } 
+        */
+
+        const {threadId} = req.params;
+        await threadService.addLikeToThread(Number(threadId)); 
+        res.status(200).json({ message: "Like added successfully" });
     }
     
 

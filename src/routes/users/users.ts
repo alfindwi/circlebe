@@ -2,7 +2,7 @@ import express from "express";
 import authController from "../../contollers/auth-controller";
 import followController from "../../contollers/follow-controller";
 import replyController from "../../contollers/reply-controller";
-import suggestionController from "../../contollers/suggestion-controller";
+// import suggestionController from "../../contollers/suggestion-controller";
 import threadController from "../../contollers/thread-controller";
 import userController from "../../contollers/user-controller";
 import { authentication } from "../../middlewares/authentication";
@@ -35,12 +35,15 @@ routerV1.get("/google/callback", authController.googleOAuthCallback)
 routerV1.get("/thread",authentication,threadController.find)
 routerV1.get("/thread/:id",authentication, threadController.findById)
 routerV1.post("/thread", authentication, upload.single("image") ,threadController.create)
+routerV1.post("/threads/:threadId/like", threadController.addLike);
 routerV1.patch("/thread/:id",authentication, threadController.update)
 routerV1.delete("/thread/:id",authentication, threadController.delete)
 
-routerV1.get("/follow", followController.getFollowers)
+routerV1.get("/followers/:userId", followController.getFollowers);
+routerV1.get("/following/:userId", followController.getFollowing);
+routerV1.post("/follow", authentication, followController.followUser);
 
-routerV1.get("/suggestion/:userId", suggestionController.getSuggestions)
+// routerV1.get("/suggestion/:userId", suggestionController.getSuggestions)
 
 
 routerV1.get("/replies",authentication, replyController.findReply)

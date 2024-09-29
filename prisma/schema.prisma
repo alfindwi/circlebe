@@ -26,8 +26,8 @@ model User {
   socialConnection SocialConnection?
   role           RoleEnum  @default(MEMBER)
   thread          Thread[]
-  Following      Follow[] @relation("Following")
-  Followers     Follow[] @relation("Followers")
+  following       Follow[]  @relation("Following")
+  followers       Follow[]  @relation("Followers")
   replies          Reply[] 
   SuggestionsGiven  Suggestion[]  @relation("SuggestionsGiven")
   SuggestionsReceived Suggestion[] @relation("SuggestionsReceived")
@@ -64,13 +64,16 @@ model Reply {
 }
 
 model Follow {
-  id          Int    @id @default(autoincrement())
-  followerId  Int @default(0)
-  followingId Int @default(0)
-  follower    User   @relation("Following", fields: [followerId], references: [id])
-  following   User   @relation("Followers", fields: [followingId], references: [id])
-  createdAt   DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+   id            Int     @id @default(autoincrement())
+  followerId    Int
+  followingId   Int
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  follower      User    @relation("Followers", fields: [followerId], references: [id])
+  following     User    @relation("Following", fields: [followingId], references: [id])
+
+  @@unique([followerId, followingId])
 }
 
 model Suggestion {
@@ -94,4 +97,3 @@ enum SocialConnection {
   GITHUB
   FACEBOOK
 }
-

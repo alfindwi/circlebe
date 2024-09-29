@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Follow" ALTER COLUMN "followerId" DROP DEFAULT,
+ALTER COLUMN "followingId" DROP DEFAULT;

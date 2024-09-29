@@ -21,6 +21,26 @@ const doc = {
   ],
   components: {
     "@schemas": {
+      "AddThreadLikeDTO": {
+        "type": "object",
+        "properties": {
+          "threadId": {
+            "type": "integer",
+          },
+          "userId": {
+            "type": "integer",
+          }
+        },
+        "required": ["threadId", "userId"]
+      },
+      CreateFollowDTO: {
+        type: "object",
+        properties: {
+          followingId: {
+            type: "integer",
+          }
+        },
+      },      
       CreateReplyDTO: {
         type: "object",
         properties: {
@@ -36,7 +56,7 @@ const doc = {
             },
         },
         required: ["content", "threadId"],
-    },
+      },
       CreateThreadDTO: {
         type: "object",
         properties: {

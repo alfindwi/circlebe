@@ -29,7 +29,7 @@ class threadService{
     return thread;
 }
 
-async addReplyToThread(threadId: number, replyData: any) {
+  async addReplyToThread(threadId: number, replyData: any) {
     const reply = await prisma.reply.create({
         data: {
             ...replyData,
@@ -47,6 +47,18 @@ async addReplyToThread(threadId: number, replyData: any) {
     });
 
     return reply;
+  }
+
+  async addLikeToThread(threadId: number) {
+    const updatedThread = await prisma.thread.update({
+        where: { id: threadId },
+        data: {
+            likesCount: {
+                increment: 1,
+            },
+        },
+    });
+    return updatedThread;
   }
 
 
