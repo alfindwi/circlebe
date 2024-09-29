@@ -1,5 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { CreateFollowDTO } from "../dto/follow-dto";
+import { customError, customErrorCode } from "../types/error";
+import { boolean } from "joi";
 
 const prisma = new PrismaClient();
 
@@ -46,43 +48,65 @@ class FollowService {
     });
   }
 
-  async getFollowers(userId: number): Promise<CreateFollowDTO[]> {
+  async getFollowers(userId: number) {
     const followers = await prisma.follow.findMany({
-      where: {
-        followingId: userId,
-      },
-      include: {
-        follower: true,
-      },
+        where: {
+            followingId: userId, 
+        },
+        include: {
+            follower: true,
+        },
     });
 
     return followers.map(follow => ({
-      id: follow.id,
-      followerId: follow.followerId,
-      followingId: follow.followingId,
-      createdAt: follow.createdAt,
-      updatedAt: follow.updatedAt,
-    })) as CreateFollowDTO[];
+        id: follow.id,
+        followerId: follow.followerId,
+        followingId: follow.followingId,
+        follower: follow.follower,
+        isFollowing: false,
+    }));
   }
 
-  async getFollowing(userId: number): Promise<CreateFollowDTO[]> {
-    const following = await prisma.follow.findMany({
+  async getFollowersByUserId(userId: number) {
+    return await prisma.follow.findMany({
       where: {
-        followerId: userId,
+        followingId: userId,  // Ambil semua pengguna yang mengikuti userId ini
       },
       include: {
-        following: true,
+        follower: true, // Sertakan informasi dari follower
       },
+    });
+  }
+
+  async getFollowingByUserId(userId: number) {
+    return await prisma.follow.findMany({
+      where: {
+        followerId: userId,  
+      },
+      include: {
+        following: true, 
+      },
+    });
+  }
+
+  async getFollowing(userId: number) {
+    const following = await prisma.follow.findMany({
+        where: {
+            followerId: userId, 
+        },
+        include: {
+            following: true,
+        },
     });
 
     return following.map(follow => ({
-      id: follow.id,
-      followerId: follow.followerId,
-      followingId: follow.followingId,
-      createdAt: follow.createdAt,
-      updatedAt: follow.updatedAt,
-    })) as CreateFollowDTO[];
+        id: follow.id,
+        followerId: follow.followerId,
+        followingId: follow.followingId,
+        following: follow.following,
+        isFollowing: false,
+    }));
   }
 }
 
-export default new FollowService(); 
+export default new FollowService();
