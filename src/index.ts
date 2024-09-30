@@ -6,11 +6,15 @@ import swaggerDocument from "../swagger/swagger-output.json"
 
 dotenv.config();
 
+const port = process.env.PORT || 4000;
 const app : Express = express();
 app.use(express.json());
-const port = process.env.PORT || 4000;
 const cors = require('cors')
-app.use(cors())
+app.use(cors({
+  origin: 'https://b56stage2-circle.vercel.app',  
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true,
+}));
 
 if (process.env.NODE_ENV !== "production") {
     app.use(

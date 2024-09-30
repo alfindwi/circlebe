@@ -101,7 +101,7 @@ class AuthController {
             code,
             client_id: GOOGLE_CLIENT_ID,
             client_secret: GOOGLE_CLIENT_SECRET,
-            redirect_uri: "http://localhost:4000/api/v1/google/callback",
+            redirect_uri: "/google/callback",
             grant_type: "authorization_code",
         }   
 
