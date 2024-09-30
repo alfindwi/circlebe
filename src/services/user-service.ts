@@ -24,7 +24,6 @@ class userService{
           const user = await prisma.user.findUnique({
               where: { id },
           });
-  
           return user;
       } catch (error) {
           console.error("Error in getUserById service:", error);
