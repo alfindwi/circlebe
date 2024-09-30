@@ -30,18 +30,10 @@ model User {
   following       Follow[]  @relation("Following")
   followers       Follow[]  @relation("Followers")
   replies          Reply[] 
-  profile   Profile?
   SuggestionsGiven  Suggestion[]  @relation("SuggestionsGiven")
   SuggestionsReceived Suggestion[] @relation("SuggestionsReceived")
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
-}
-
-model Profile {
-  id Int @id @default(autoincrement())
-  name String
-  userId Int @unique
-  user User @relation(fields: [userId], references: [id])
 }
 
 
