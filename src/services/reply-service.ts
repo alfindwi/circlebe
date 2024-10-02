@@ -55,7 +55,7 @@ class replyService {
     try {
       const replies = await prisma.reply.findMany({
         where: { threadId: threadId }, 
-        include: { user: true },      
+        include: { user: true, likes: true },      
       });
 
       return replies;
@@ -64,6 +64,54 @@ class replyService {
       throw new Error("Error fetching replies from database");
     }
   }
+
+  async addLikeToReply(replyId: number, userId: number): Promise<string> {
+    const existingLike = await prisma.like.findUnique({
+        where: {
+            userId_replyId: {
+                userId,
+                replyId,
+            },
+        },
+    });
+
+    if (existingLike) {
+        throw new Error("User has already liked this reply");
+    }
+
+    await prisma.like.create({
+        data: {
+            userId,
+            replyId,
+        },
+    });
+
+    return "Like added successfully";
+}
+
+
+  async removeLikeFromReply(replyId: number, userId: number): Promise<string> {
+    const existingLike = await prisma.like.findUnique({
+        where: {
+            userId_replyId: {
+                userId,
+                replyId,
+            },
+        },
+    });
+
+    if (!existingLike) {
+        throw new Error("Like does not exist");
+    }
+
+    await prisma.like.delete({
+        where: {
+            id: existingLike.id, // Assuming `id` is the primary key for the like record
+        },
+    });
+
+    return "Like removed successfully";
+}
 }
 
 

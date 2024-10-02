@@ -33,21 +33,59 @@ class ThreadController {
       }
     }
   
-    async addLike(req: Request, res: Response) {
+    async addLikeFromThread(req: Request, res: Response) {
+      /*  #swagger.requestBody = {
+            required: true,
+            content: {
+                "application/json": {
+                    schema: {
+                        $ref: "#/components/schemas/AddThreadLikeDTO"
+                    }  
+                }
+            }
+        } 
+    */
       try {
         const { threadId } = req.params;
-        const user = (req as any).user; 
-        
+        const user = (req as any).user;
+
         if (!user) {
           return res.status(401).json({ message: "User not authenticated" });
         }
-  
-        await threadService.addLikeToThread(Number(threadId), user.id);
-        res.status(200).json({ message: "Like added successfully" });
+
+        const message = await threadService.addLikeToThread(Number(threadId), user.id);
+        res.status(200).json({ message });
       } catch (error) {
-        res.status(500).json({ message: (error as Error).message });
+          res.status(500).json({ message: (error as Error).message });
       }
     }
+
+    async removeLikeFromThread(req: Request, res: Response) {
+      /*  #swagger.requestBody = {
+            required: true,
+            content: {
+                "application/json": {
+                    schema: {
+                        $ref: "#/components/schemas/RemoveThreadLikeDTO"
+                    }  
+                }
+            }
+        } 
+    */
+      try {
+          const { threadId } = req.params;
+          const user = (req as any).user;
+
+          if (!user) {
+              return res.status(401).json({ message: "User not authenticated" });
+          }
+
+          const message = await threadService.removeLikeFromThread(Number(threadId), user.id);
+          res.status(200).json({ message });
+      } catch (error) {
+          res.status(500).json({ message: (error as Error).message });
+      }
+  }
   
     async findThreadByUserId(req: Request, res: Response) {
       try {
@@ -75,7 +113,7 @@ class ThreadController {
   
     async create(req: Request, res: Response) {
       try {
-        const user = (req as any).user; // Ambil informasi user dari request
+        const user = (req as any).user; 
         
         if (!user) {
           return res.status(401).json({ message: "User not authenticated" });
@@ -88,7 +126,6 @@ class ThreadController {
           image: image.secure_url,
         };
   
-        // Validasi input menggunakan skema yang telah ditentukan
         const value = await createThreadScehma.validateAsync(body);
         
         const thread = await threadService.createThread(value, user);
@@ -98,7 +135,6 @@ class ThreadController {
       }
     }
   
-    // Memperbarui thread yang ada
     async update(req: Request, res: Response) {
       try {
         const thread = await threadService.updateThread(req.body);
@@ -113,7 +149,6 @@ class ThreadController {
       }
     }
   
-    // Menghapus thread
     async delete(req: Request, res: Response) {
       try {
         const id = Number(req.params.id);

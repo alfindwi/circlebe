@@ -529,7 +529,58 @@
           {
             "bearerAuth": []
           }
-        ]
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddThreadLikeDTO"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/threads/{threadId}/unlike": {
+      "delete": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "threadId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemoveThreadLikeDTO"
+              }
+            }
+          }
+        }
       }
     },
     "/api/v1/followers": {
@@ -631,15 +682,11 @@
           }
         ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "followingId": {
-                    "example": "any"
-                  }
-                }
+                "$ref": "#/components/schemas/unfollowDTO"
               }
             }
           }
@@ -726,6 +773,88 @@
           }
         ]
       }
+    },
+    "/api/v1/replies/{replyId}/like": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "replyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddReplyLikeDTO"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/replies/{replyId}/unlike": {
+      "delete": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "replyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemoveReplyLikeDTO"
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -736,6 +865,19 @@
       }
     },
     "schemas": {
+      "CreateFollowDTO": {
+        "type": "object",
+        "properties": {
+          "followedId": {
+            "type": "integer",
+            "description": "ID of the user to be followed",
+            "example": 2
+          }
+        },
+        "required": [
+          "followedId"
+        ]
+      },
       "AddThreadLikeDTO": {
         "type": "object",
         "properties": {
@@ -747,26 +889,42 @@
           "threadId"
         ]
       },
-      "CreateFollowDTO": {
+      "RemoveThreadLikeDTO": {
         "type": "object",
         "properties": {
-          "followingId": {
+          "threadId": {
             "type": "integer"
           }
         }
       },
-      "UnfollowRequest": {
+      "AddReplyLikeDTO": {
         "type": "object",
         "properties": {
-          "followingId": {
-            "type": "integer",
-            "description": "Id yang akan berhenti diikuti"
-          },
-          "followerId": {
-            "type": "integer",
-            "description": "Id yang ingin diikuti"
+          "replyId": {
+            "type": "integer"
           }
         }
+      },
+      "RemoveReplyLikeDTO": {
+        "type": "object",
+        "properties": {
+          "replyId": {
+            "type": "integer"
+          }
+        }
+      },
+      "unfollowDTO": {
+        "type": "object",
+        "properties": {
+          "followedId": {
+            "type": "integer",
+            "description": "ID of the user to be unfollowed",
+            "example": 2
+          }
+        },
+        "required": [
+          "followedId"
+        ]
       },
       "CreateReplyDTO": {
         "type": "object",

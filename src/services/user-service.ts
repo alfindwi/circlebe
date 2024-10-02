@@ -28,6 +28,10 @@ class userService{
       try {
           const user = await prisma.user.findUnique({
               where: { id },
+              include: {
+                followeds: true,
+                followers: true
+              }
           });
           return user;
       } catch (error) {

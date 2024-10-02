@@ -65,6 +65,61 @@ class replyController {
             res.status(400).json({ error: (error as Error).message });
         }
     }
+
+    async addLikeFromReply(req: Request, res: Response) {
+        /*  #swagger.requestBody = {
+            required: true,
+            content: {
+                "application/json": {
+                    schema: {
+                        $ref: "#/components/schemas/AddReplyLikeDTO"
+                    }  
+                }
+            }
+        } 
+        */
+        try {
+            const { replyId } = req.params;
+            const user = (req as any).user;
+    
+            if (!user) {
+                return res.status(401).json({ message: "User not authenticated" });
+            }
+    
+            const message = await replyService.addLikeToReply(Number(replyId), user.id);
+            res.status(200).json({ message });
+        } catch (error) {
+            res.status(500).json({ message: (error as Error).message });
+        }
+    }
+    
+
+    async removeLikeFromReply(req: Request, res: Response) {
+        /*  #swagger.requestBody = {
+            required: true,
+            content: {
+                "application/json": {
+                    schema: {
+                        $ref: "#/components/schemas/RemoveReplyLikeDTO"
+                    }  
+                }
+            }
+        } 
+    */
+        try {
+            const { threadId } = req.params;
+            const user = (req as any).user;
+  
+            if (!user) {
+                return res.status(401).json({ message: "User not authenticated" });
+            }
+  
+            const message = await replyService.removeLikeFromReply(Number(threadId), user.id);
+            res.status(200).json({ message });
+        } catch (error) {
+            res.status(500).json({ message: (error as Error).message });
+        }
+    }
     
 }
 

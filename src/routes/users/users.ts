@@ -35,20 +35,20 @@ routerV1.get("/google/callback", authController.googleOAuthCallback)
 routerV1.get("/thread",authentication,threadController.find)
 routerV1.get("/thread/:id",authentication, threadController.findById)
 routerV1.post("/thread", authentication, upload.single("image") ,threadController.create)
-routerV1.post("/threads/:threadId/like", authentication, threadController.addLike);
+routerV1.post("/threads/:threadId/like", authentication, threadController.addLikeFromThread);
+routerV1.delete("/threads/:threadId/unlike", authentication, threadController.removeLikeFromThread);
 routerV1.patch("/thread/:id",authentication, threadController.update)
 routerV1.delete("/thread/:id",authentication, threadController.delete)
 
-// routerV1.get("/followers", followController.getFollowers);
+
 routerV1.get("/followers", authentication ,followController.getFollowers);
 routerV1.get("/following", authentication ,followController.getFollowing);
 routerV1.post("/follow", authentication, followController.followUser);
 routerV1.post("/unfollow", authentication, followController.unfollowUser);
 
-// routerV1.get("/suggestion/:userId", suggestionController.getSuggestions)
-
-
 routerV1.get("/replies",authentication, replyController.findReply)
 routerV1.get("/replies/:id",authentication, replyController.getRepliesByThreadId)
 routerV1.post("/replies",authentication, upload.single("image") , replyController.createReply)
+routerV1.post("/replies/:replyId/like", authentication, replyController.addLikeFromReply);
+routerV1.delete("/replies/:replyId/unlike", authentication, replyController.removeLikeFromReply);
 

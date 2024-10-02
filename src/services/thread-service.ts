@@ -43,22 +43,58 @@ class threadService {
     return reply;
   }
 
-  async addLikeToThread(threadId: number, userId: number) {
-    const like = await prisma.like.create({
-      data: {
-        threadId: threadId, 
-        userId: userId, 
-      },
+  async addLikeToThread(threadId: number, userId: number): Promise<string> {
+    const existingLike = await prisma.like.findUnique({
+        where: {
+            userId_threadId: {
+                userId,
+                threadId,
+            },
+        },
     });
 
-    return like;
+    if (existingLike) {
+        throw new Error("User has already liked this thread");
+    }
+
+    await prisma.like.create({
+        data: {
+            userId,
+            threadId,
+        },
+    });
+
+    return "Like added successfully";
+  }
+
+  async removeLikeFromThread(threadId: number, userId: number): Promise<string> {
+    const existingLike = await prisma.like.findUnique({
+        where: {
+            userId_threadId: {
+                userId,
+                threadId,
+            },
+        },
+    });
+
+    if (!existingLike) {
+        throw new Error("Like does not exist");
+    }
+
+    await prisma.like.delete({
+        where: {
+            id: existingLike.id, // Assuming `id` is the primary key for the like record
+        },
+    });
+
+    return "Like removed successfully";
   }
 
   async getThreadsByUserId(userId: number): Promise<Thread[]> {
     try {
       const threads = await prisma.thread.findMany({
         where: { userId: userId },
-        include: { user: true }, 
+        include: { user: true, replies: true, likes: true }, 
       });
 
       return threads;

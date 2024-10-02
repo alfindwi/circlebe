@@ -21,7 +21,18 @@ const doc = {
   ],
   components: {
     "@schemas": {
-      "AddThreadLikeDTO": {
+      CreateFollowDTO: {
+        type: "object",
+        properties: {
+          followedId: {
+            type: "integer",
+            description: "ID of the user to be followed",
+            example: 2
+          }
+        },
+        required: ["followedId"]
+      },
+      AddThreadLikeDTO: {
         "type": "object",
         "properties": {
           "threadId": {
@@ -30,27 +41,41 @@ const doc = {
         },
         "required": ["threadId"]
       },
-      CreateFollowDTO: {
-        type: "object",
-        properties: {
-          followingId: {
-            type: "integer",
-          }
+      RemoveThreadLikeDTO: {
+        "type": "object",
+        "properties": {
+          "threadId": {
+            "type": "integer",
+          },
         },
       },
-      UnfollowRequest: {
+      AddReplyLikeDTO: {
+        "type": "object",
+        "properties": {
+          "replyId": {
+            "type": 'integer',
+          },
+        },
+      },
+      RemoveReplyLikeDTO: {
+        "type": "object",
+        "properties": {
+          "replyId": {
+            "type": "integer",
+          },
+        },
+      },
+      unfollowDTO: {
         type: "object",
         properties: {
-          followingId: {
+          followedId: {
             type: "integer",
-            description: "Id yang akan berhenti diikuti"
-          },
-          followerId: {
-            type: "integer",
-            description: "Id yang ingin diikuti"
+            description: "ID of the user to be unfollowed",
+            example: 2
           }
         },
-      },     
+        required: ["followedId"]
+      },      
       CreateReplyDTO: {
         type: "object",
         properties: {
