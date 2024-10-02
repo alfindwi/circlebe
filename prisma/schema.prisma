@@ -26,10 +26,14 @@ model User {
   bio            String?
   socialConnection SocialConnection?
   role           RoleEnum  @default(MEMBER)
+
   thread          Thread[]
-  following       Follow[]  @relation("Following")
-  followers       Follow[]  @relation("Followers")
-  replies          Reply[] 
+  replies          Reply[]
+  likes            Like[]
+
+  followeds       Follow[]  @relation(name: "followed")
+  followers       Follow[]  @relation(name: "follower")
+
   SuggestionsGiven  Suggestion[]  @relation("SuggestionsGiven")
   SuggestionsReceived Suggestion[] @relation("SuggestionsReceived")
   createdAt      DateTime  @default(now())
@@ -41,11 +45,13 @@ model Thread {
   id        Int      @id @default(autoincrement())
   content   String
   image     String?
-  likesCount Int    @default(0)
-  repliesCount Int @default(0)
+
   replies   Reply []
+  likes   Like[]
+
   user User @relation(fields: [userId], references: [id])
   userId    Int
+
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 }
@@ -54,9 +60,11 @@ model Reply {
   id        Int      @id @default(autoincrement())
   content   String
   image     String?
+  likes   Like[]
+
   user      User   @relation(fields: [userId], references: [id])
   userId    Int
-  likes     Int @default(0)
+  
   thread    Thread @relation(fields: [threadId], references: [id])
   threadId Int
 
@@ -64,17 +72,32 @@ model Reply {
   updatedAt      DateTime  @updatedAt
 }
 
+model Like{
+  id  Int  @id @default(autoincrement())
+  
+  user User? @relation(fields: [userId], references: [id])
+  userId  Int?
+
+  thread Thread? @relation(fields: [threadId], references: [id])
+  threadId  Int?
+
+  reply Reply? @relation(fields: [replyId], references: [id])
+  replyId   Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
 model Follow {
    id            Int     @id @default(autoincrement())
-  followerId    Int
-  followingId   Int
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  follower      User    @relation("Followers", fields: [followerId], references: [id])
-  following     User    @relation("Following", fields: [followingId], references: [id])
+  followed      User?    @relation(name: "followed", fields: [followedId], references: [id])
+  followedId    Int?
 
-  @@unique([followerId, followingId])
+  follower     User?    @relation("follower", fields: [followerId], references: [id])
+  followerId  Int? 
 }
 
 model Suggestion {

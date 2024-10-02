@@ -10,11 +10,7 @@ const port = process.env.PORT || 4000;
 const app : Express = express();
 app.use(express.json());
 const cors = require('cors')
-app.use(cors({
-  origin: 'https://b56stage2-circle.vercel.app',  
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  credentials: true,
-}));
+app.use(cors());
 
 if (process.env.NODE_ENV !== "production") {
     app.use(

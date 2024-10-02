@@ -13,7 +13,7 @@ const doc = {
       url: "http://localhost:4000",
     },
     {
-      url: "https://circle.vercel.app",
+      url: "https://b56stage2-online-circle.vercel.app",
     },
     {
       url: "https://circle-staging.vercel.app",
@@ -27,11 +27,8 @@ const doc = {
           "threadId": {
             "type": "integer",
           },
-          "userId": {
-            "type": "integer",
-          }
         },
-        "required": ["threadId", "userId"]
+        "required": ["threadId"]
       },
       CreateFollowDTO: {
         type: "object",
@@ -40,7 +37,7 @@ const doc = {
             type: "integer",
           }
         },
-      },      
+      },
       UnfollowRequest: {
         type: "object",
         properties: {

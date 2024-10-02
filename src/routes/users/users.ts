@@ -35,7 +35,7 @@ routerV1.get("/google/callback", authController.googleOAuthCallback)
 routerV1.get("/thread",authentication,threadController.find)
 routerV1.get("/thread/:id",authentication, threadController.findById)
 routerV1.post("/thread", authentication, upload.single("image") ,threadController.create)
-routerV1.post("/threads/:threadId/like", threadController.addLike);
+routerV1.post("/threads/:threadId/like", authentication, threadController.addLike);
 routerV1.patch("/thread/:id",authentication, threadController.update)
 routerV1.delete("/thread/:id",authentication, threadController.delete)
 

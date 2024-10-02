@@ -7,7 +7,12 @@ const prisma = new PrismaClient()
 
 class userService{
      async getAllUsers() : Promise<User[]> {
-      const users = await prisma.user.findMany()
+      const users = await prisma.user.findMany({
+        include: {
+          followeds: true,
+          followers: true,  
+        }
+      })
 
       if(!users) {
         throw {

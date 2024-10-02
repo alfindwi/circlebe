@@ -10,7 +10,7 @@
       "url": "http://localhost:4000"
     },
     {
-      "url": "https://circle.vercel.app"
+      "url": "https://b56stage2-online-circle.vercel.app"
     },
     {
       "url": "https://circle-staging.vercel.app"
@@ -231,6 +231,9 @@
           "400": {
             "description": "Bad Request"
           },
+          "404": {
+            "description": "Not Found"
+          },
           "500": {
             "description": "Internal Server Error"
           }
@@ -332,11 +335,8 @@
       "get": {
         "description": "",
         "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "400": {
-            "description": "Bad Request"
+          "default": {
+            "description": ""
           }
         }
       }
@@ -400,17 +400,7 @@
           {
             "bearerAuth": []
           }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateThreadDTO"
-              }
-            }
-          }
-        }
+        ]
       }
     },
     "/api/v1/thread/{id}": {
@@ -432,6 +422,9 @@
           },
           "401": {
             "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
           },
           "500": {
             "description": "Internal Server Error"
@@ -462,6 +455,9 @@
           "401": {
             "description": "Unauthorized"
           },
+          "404": {
+            "description": "Not Found"
+          },
           "500": {
             "description": "Internal Server Error"
           }
@@ -470,17 +466,7 @@
           {
             "bearerAuth": []
           }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateThreadDTO"
-              }
-            }
-          }
-        }
+        ]
       },
       "delete": {
         "description": "",
@@ -500,6 +486,9 @@
           },
           "401": {
             "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
           },
           "500": {
             "description": "Internal Server Error"
@@ -528,18 +517,19 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
           }
         },
-        "requestBody": {
-          "required": true,
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "$ref": "#/components/schemas/AddThreadLikeDTO"
-              }
-            }
+        "security": [
+          {
+            "bearerAuth": []
           }
-        }
+        ]
       }
     },
     "/api/v1/followers": {
@@ -751,14 +741,10 @@
         "properties": {
           "threadId": {
             "type": "integer"
-          },
-          "userId": {
-            "type": "integer"
           }
         },
         "required": [
-          "threadId",
-          "userId"
+          "threadId"
         ]
       },
       "CreateFollowDTO": {

@@ -6,107 +6,75 @@ import { boolean } from "joi";
 const prisma = new PrismaClient();
 
 class FollowService {
-  async createFollow(followerId: number, followingId: number) {
-    const [followerExists, followingExists] = await Promise.all([
+  // Create follow relationship
+  async createFollow(followerId: number, followedId: number) {
+    const [followerExists, followedExists] = await Promise.all([
       prisma.user.findUnique({ where: { id: followerId } }),
-      prisma.user.findUnique({ where: { id: followingId } }),
+      prisma.user.findUnique({ where: { id: followedId } }),
     ]);
 
-    if (!followerExists || !followingExists) {
-      throw new Error("Invalid followerId or followingId: User not found");
+    if (!followerExists || !followedExists) {
+      throw new Error("Invalid followerId or followedId: User not found");
     }
 
-    const followExists = await prisma.follow.findUnique({
-      where: {
-        followerId_followingId: {
-          followerId: followerId,
-          followingId: followingId,
-        },
-      },
-    });
-
-    if (followExists) {
-      throw new Error("Already following this user");
-    }
 
     const follow = await prisma.follow.create({
       data: {
         followerId: followerId,
-        followingId: followingId,
+        followedId: followedId,
       },
     });
 
     return follow;
   }
 
-  async unfollowUser(followerId: number, followingId: number): Promise<void> {
+  async unfollowUser(followerId: number, followedId: number): Promise<void> {
     await prisma.follow.deleteMany({
       where: {
         followerId,
-        followingId,
+        followedId,
       },
     });
   }
 
   async getFollowers(userId: number) {
     const followers = await prisma.follow.findMany({
-        where: {
-            followingId: userId, 
-        },
-        include: {
-            follower: true,
-        },
+      where: {
+        followedId: userId, // Users following this user
+      },
+      include: {
+        follower: true,
+      },
     });
 
     return followers.map(follow => ({
-        id: follow.id,
-        followerId: follow.followerId,
-        followingId: follow.followingId,
-        follower: follow.follower,
-        isFollowing: false,
+      id: follow.id,
+      followerId: follow.followerId,
+      followedId: follow.followedId,
+      follower: follow.follower,
+      isFollowing: false, 
     }));
-  }
-
-  async getFollowersByUserId(userId: number) {
-    return await prisma.follow.findMany({
-      where: {
-        followingId: userId,  // Ambil semua pengguna yang mengikuti userId ini
-      },
-      include: {
-        follower: true, // Sertakan informasi dari follower
-      },
-    });
-  }
-
-  async getFollowingByUserId(userId: number) {
-    return await prisma.follow.findMany({
-      where: {
-        followerId: userId,  
-      },
-      include: {
-        following: true, 
-      },
-    });
   }
 
   async getFollowing(userId: number) {
     const following = await prisma.follow.findMany({
-        where: {
-            followerId: userId, 
-        },
-        include: {
-            following: true,
-        },
+      where: {
+        followerId: userId, 
+      },
+      include: {
+        followed: true, 
+      },
     });
 
     return following.map(follow => ({
-        id: follow.id,
-        followerId: follow.followerId,
-        followingId: follow.followingId,
-        following: follow.following,
-        isFollowing: false,
+      id: follow.id,
+      followerId: follow.followerId,
+      followedId: follow.followedId,
+      followed: follow.followed,
+      isFollowing: false,
     }));
   }
 }
+
 
 export default new FollowService();
