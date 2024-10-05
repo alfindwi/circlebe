@@ -36,13 +36,13 @@ export class FollowController {
 
   async getFollowers(req: Request, res: Response) {
     try {
-      const userId = (req as any).user.id;
-      const followers = await followService.getFollowers(userId);
-      return res.status(200).json(followers);
+        const userId = (req as any).user.id; // Ambil user ID dari token
+        const followers = await followService.getFollowers(userId);
+        return res.status(200).json(followers);
     } catch (error) {
-      return res.status(500).json({ error: (error as Error).message || "An error occurred while retrieving followers." });
+        return res.status(500).json({ error: (error as Error).message || "An error occurred while retrieving followers." });
     }
-  }
+}
 
   async getFollowing(req: Request, res: Response) {
     try {
