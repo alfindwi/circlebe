@@ -85,7 +85,7 @@ class ThreadController {
       } catch (error) {
           res.status(500).json({ message: (error as Error).message });
       }
-  }
+    }
   
     async findThreadByUserId(req: Request, res: Response) {
       try {
@@ -113,27 +113,32 @@ class ThreadController {
   
     async create(req: Request, res: Response) {
       try {
-        const user = (req as any).user; 
-        
-        if (!user) {
-          return res.status(401).json({ message: "User not authenticated" });
-        }
+          const user = (req as any).user; 
+          if (!user) {
+              return res.status(401).json({ message: "User not authenticated" });
+          }
   
-        const image = await cloudinaryService.uploadSingle(req.file as Express.Multer.File);
-        
-        const body = {
-          ...req.body,
-          image: image.secure_url,
-        };
+          console.log("Uploaded file:", req.file); // Log file untuk melihat apakah ada
   
-        const value = await createThreadScehma.validateAsync(body);
-        
-        const thread = await threadService.createThread(value, user);
-        res.json(thread);
+          if (!req.file) {
+              return res.status(400).json({ message: "Image file is required" });
+          }
+  
+          const image = await cloudinaryService.uploadSingle(req.file as Express.Multer.File);
+          const body = {
+              ...req.body,
+              image: image.secure_url,
+          };
+  
+          const value = await createThreadScehma.validateAsync(body);
+          const thread = await threadService.createThread(value, user);
+          res.json(thread);
       } catch (error) {
-        res.status(500).json({ message: (error as Error).message });
+          console.error("Error creating thread:", error); // Log error untuk debugging
+          res.status(500).json({ message: (error as Error).message });
       }
-    }
+  }
+  
   
     async update(req: Request, res: Response) {
       try {

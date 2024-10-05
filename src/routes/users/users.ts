@@ -2,7 +2,6 @@ import express from "express";
 import authController from "../../contollers/auth-controller";
 import followController from "../../contollers/follow-controller";
 import replyController from "../../contollers/reply-controller";
-// import suggestionController from "../../contollers/suggestion-controller";
 import threadController from "../../contollers/thread-controller";
 import userController from "../../contollers/user-controller";
 import { authentication } from "../../middlewares/authentication";
@@ -17,12 +16,17 @@ routerV1.get("/users/:id", userController.findById)
 routerV1.get("/users/email/:email", userController.findByEmail)
 routerV1.get("/users/fullName/:fullName", userController.findByFullname)
 routerV1.get("/users/:userId/thread", threadController.findThreadByUserId);
+routerV1.get("/users/:userId/suggestion", userController.getSuggestion);
 routerV1.post("/users",userController.create)
-routerV1.patch("/users/:id",authentication, upload.single("image") , userController.update);
+routerV1.patch("/users/:id", authentication, upload.fields([
+  { name: "image", maxCount: 1 },            
+  { name: "backgroundImage", maxCount: 1 }  
+]), userController.update);
 routerV1.delete("/users/:id", userController.delete)
 
 routerV1.post("/auth/login", authController.login)
 routerV1.post("/auth/register", authController.register)
+routerV1.post("/auth/logout", authController.logout)
 routerV1.get("/auth/check",authentication, authController.check)
 
 routerV1.get("/dashboard", authentication, authorize("ADMIN"), (req, res) => {
@@ -45,6 +49,8 @@ routerV1.get("/followers", authentication ,followController.getFollowers);
 routerV1.get("/following", authentication ,followController.getFollowing);
 routerV1.post("/follow", authentication, followController.followUser);
 routerV1.post("/unfollow", authentication, followController.unfollowUser);
+
+
 
 routerV1.get("/replies",authentication, replyController.findReply)
 routerV1.get("/replies/:id",authentication, replyController.getRepliesByThreadId)

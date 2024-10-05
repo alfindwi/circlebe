@@ -32,6 +32,10 @@ const doc = {
         },
         required: ["followedId"]
       },
+      logoutDTO: {
+        "type": "object",
+        "description": "DTO for logging out. No additional properties required."
+      },
       AddThreadLikeDTO: {
         "type": "object",
         "properties": {
@@ -143,6 +147,10 @@ const doc = {
             type: "string",
           },
           image: {
+            type: "string",
+            format: "binary"
+          },
+          backgroundImage: {
             type: "string",
             format: "binary"
           },

@@ -8,7 +8,9 @@ class UserController {
     
     async find (req: Request, res: Response) {
         try {
-            const users = await userService.getAllUsers();
+            const users = await userService.getAllUsers(
+                
+            );
         res.json({data: users});  
         } catch (error) {
             res.status(500).json(error)
@@ -66,6 +68,23 @@ class UserController {
         }
     }
 
+    async getSuggestion (req: Request, res: Response) {
+        const { userId } = req.params;
+
+        try {
+          const unfollowedUsers = await userService.getUserSuggestion(Number(userId));
+      
+          if (!unfollowedUsers || unfollowedUsers.length === 0) {
+            return res.status(404).json({ message: 'No users available to follow' });
+          }
+      
+          return res.status(200).json(unfollowedUsers);
+        } catch (error) {
+          console.error('Error fetching unfollowed users:', error);
+          return res.status(500).json({ message: 'Internal Server Error' });
+        }
+    }
+
     async create (req: Request, res: Response) {
         /*  #swagger.requestBody = {
             required: true,
@@ -112,22 +131,33 @@ class UserController {
                 return res.status(400).json({ message: "User ID is required" });
             }
     
-            if (!req.file) {
-                return res.status(400).json({ message: "Image file is required" });
-            }
-    
-            const image = await cloudinaryService.uploadSingle(req.file as Express.Multer.File);
-
-            const body = {
-                ...req.body,
-                image: image.secure_url, 
+            // Mengakses file dari req.files
+            const { image, backgroundImage } = req.files as {
+                image?: Express.Multer.File[];
+                backgroundImage?: Express.Multer.File[];
             };
     
-            const value = await updateUserScehma.validateAsync(body);
+            // Memastikan ada file yang diupload
+            if (!image || !backgroundImage) {
+                return res.status(400).json({ message: "Both image and background image are required" });
+            }
     
-            const users = await userService.updateUser(userId, value);
-            
-            res.json(users);
+            // Mengupload file ke Cloudinary
+            const imageUrl = await cloudinaryService.uploadSingle(image[0]); // Menggunakan image pertama
+            const backgroundImageUrl = await cloudinaryService.uploadSingle(backgroundImage[0]); // Menggunakan backgroundImage pertama
+    
+            // Data yang akan diupdate
+            const body = {
+                ...req.body,
+                image: imageUrl.secure_url, 
+                backgroundImage: backgroundImageUrl.secure_url
+            };
+    
+            // Validasi dan update user
+            const value = await updateUserScehma.validateAsync(body);
+            const updatedUser = await userService.updateUser(userId, value);
+    
+            res.json(updatedUser);
         } catch (error) {
             res.status(500).json({ message: "An error occurred", error });
         }

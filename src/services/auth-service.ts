@@ -30,6 +30,10 @@ class authService{
       const user = await prisma.user.findUnique({
           where: {
               email: data.email,
+          },
+          include: {
+            followeds: true,
+            followers: true,
           }
       });
   

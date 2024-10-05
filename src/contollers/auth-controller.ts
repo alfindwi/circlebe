@@ -66,6 +66,36 @@ class AuthController {
         }
     }
 
+    async logout(req: Request, res: Response) {
+        /*  #swagger.requestBody = {
+            required: true,
+            content: {
+                "application/json": {
+                    schema: {
+                        $ref: "#/components/schemas/logoutDTO"
+                    }  
+                }
+            }
+        } 
+        */
+        try {
+            // Mengambil token dari cookies atau authorization header
+            const token = req.cookies.accessToken || req.headers.authorization?.split(' ')[1];
+            
+            // Cek apakah token ada
+            if (!token) {
+                return res.status(400).json({ message: "No token provided" });
+            }
+    
+            // Di sini bisa menambahkan logika untuk menghapus token (misalnya dari database atau blacklist)
+    
+            return res.status(200).json({ message: "Successfully logged out" });
+        } catch (error) {
+            return res.status(500).json({ message: "Logout failed", error });
+        }
+    }
+    
+
     async check (req: Request, res: Response) {
         try {
             const user = (req as any).user;

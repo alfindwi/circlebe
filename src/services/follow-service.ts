@@ -34,69 +34,89 @@ export class FollowService {
         followerId: loggedInUserId,
         followedId: followedId,
       },
-      include:{
-        followed: true
-      }
+      include: {
+        followed: true,
+      },
     });
 
     return follow;
   }
 
   async unfollowUser(loggedInUserId: number, followedId: number): Promise<void> {
-    await prisma.follow.deleteMany({
+    const unfollow = await prisma.follow.deleteMany({
       where: {
         followerId: loggedInUserId,
         followedId: followedId,
       },
     });
+
+    if (!unfollow.count) {
+      throw new Error("No follow relationship found to unfollow");
+    }
   }
 
   async getFollowers(loggedInUserId: number) {
+    // Ambil followers
     const followers = await prisma.follow.findMany({
       where: {
-        followedId: loggedInUserId, 
+        followedId: loggedInUserId,
       },
       include: {
-        follower: true, 
+        follower: true,
       },
     });
-
-    return followers.map(follow => ({
-      id: follow.id,
-      followerId: follow.followerId,
-      follower: {
-        id: follow.follower?.id,
-        fullName: follow.follower?.fullName,
-        username: follow.follower?.username,
-        bio: follow.follower?.bio,
-        image: follow.follower?.image,
-      },
+  
+    // Cek apakah logged-in user mengikuti setiap follower
+    const followersWithIsFollowing = await Promise.all(followers.map(async (follow) => {
+      const isFollowing = await prisma.follow.findFirst({
+        where: {
+          followerId: loggedInUserId,
+          followedId: follow.followerId,
+        },
+      });
+  
+      return {
+        id: follow.id,
+        followerId: follow.followerId,
+        follower: {
+          id: follow.follower.id,
+          fullName: follow.follower.fullName,
+          username: follow.follower.username,
+          bio: follow.follower.bio,
+          image: follow.follower.image,
+        },
+        isFollowing: Boolean(isFollowing),
+      };
     }));
+  
+    return followersWithIsFollowing;
   }
+  
 
-  // Mendapatkan daftar following, hanya untuk user yang sedang login
   async getFollowing(loggedInUserId: number) {
     const following = await prisma.follow.findMany({
       where: {
-        followerId: loggedInUserId, // Hanya bisa mendapatkan following untuk user yang sedang login
+        followerId: loggedInUserId,
       },
       include: {
-        followed: true, // Sertakan informasi dari pengguna yang di-follow
+        followed: true,
       },
     });
-
+  
     return following.map(follow => ({
       id: follow.id,
       followedId: follow.followedId,
       followed: {
-        id: follow.followed?.id,
-        fullName: follow.followed?.fullName,
-        username: follow.followed?.username,
-        bio: follow.followed?.bio,
-        image: follow.followed?.image,
+        id: follow.followed.id,
+        fullName: follow.followed.fullName,
+        username: follow.followed.username,
+        bio: follow.followed.bio,
+        image: follow.followed.image,
       },
+      isFollowing: true, // User sudah pasti mengikuti mereka
     }));
   }
+  
 }
 
 export default new FollowService();

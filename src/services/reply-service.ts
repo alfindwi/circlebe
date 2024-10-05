@@ -55,7 +55,14 @@ class replyService {
     try {
       const replies = await prisma.reply.findMany({
         where: { threadId: threadId }, 
-        include: { user: true, likes: true },      
+        include: { 
+          user: {
+            include: {
+              followeds: true ,
+              followers: true,
+            }
+          }, 
+        },      
       });
 
       return replies;

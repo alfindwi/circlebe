@@ -4,6 +4,7 @@ export type createUsersDTO = {
     email: string;
     passwordUsers: string;
     image?: string | null;
+    backgroundImage?: string | null
     bio: string
 };
 

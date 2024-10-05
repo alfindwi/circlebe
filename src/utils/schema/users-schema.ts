@@ -14,6 +14,7 @@ export const updateUserScehma = Joi.object<createUsersDTO>({
     fullName: Joi.string().required().min(5).max(255),
     username: Joi.string().required().min(5).max(255),
     bio: Joi.string(),
-    image: Joi.string()
+    image: Joi.string(),
+    backgroundImage: Joi.string()
 })
 

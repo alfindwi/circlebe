@@ -38,12 +38,16 @@ class userService{
           console.error("Error in getUserById service:", error);
           throw new Error("Failed to fetch user by ID");
       }
-  }
+    }
     
      async getUserByEmail(email : string) : Promise<User | null>{
       const user = await prisma.user.findUnique({
         where: {
             email: email,
+        },
+        include: {
+          followeds: true,
+          followers: true,  
         }
     })
       if (!user) {
@@ -60,7 +64,11 @@ class userService{
       const user = await prisma.user.findFirst({
        where: {
            fullName: fullName,
-       }
+       },
+       include: {
+        followeds: true,
+        followers: true,  
+      }
     })
       if (!user) {
         throw {
@@ -70,6 +78,38 @@ class userService{
         } as customError
       } 
         return user
+    }
+
+    async getUserSuggestion (userId: number){
+      const loggedInUser = await prisma.user.findUnique({
+        where: { id: userId },
+        include: {
+          followeds: true,
+        },
+      });
+    
+      if (!loggedInUser) {
+        throw new Error('User not found');
+      }
+    
+      const unfollowedUsers = await prisma.user.findMany({
+        where: {
+          NOT: {
+            id: {
+              in: loggedInUser.followeds.map(f => f.followedId), 
+            },
+          },
+          id: { not: userId }, 
+        },
+        select: {
+          id: true,
+          fullName: true,
+          username: true,
+          image: true,
+        },
+      });
+    
+      return unfollowedUsers;
     }
     
     async createUser(data : createUsersDTO) : Promise<User | null>{
@@ -116,6 +156,10 @@ class userService{
       if (data.image) {
         user.image = data.image;
       }
+
+      if (data.backgroundImage) {
+        user.backgroundImage = data.backgroundImage;
+    }
   
       return await prisma.user.update({
           data: user,
