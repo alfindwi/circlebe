@@ -2,14 +2,21 @@
   "version": 2,
   "builds": [
     {
-      "src": "dist/index.html",
-      "use": "@vercel/static"
+      "src": "src/index.ts",
+      "use": "@vercel/node",
+      "config": { "includeFiles": ["dist/**"] }
     }
   ],
   "rewrites": [
     {
-      "source": "/(.*)",
-      "destination": "/dist/index.html"
+      "source": "/(.*)", 
+      "destination": "/src/index.ts" 
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
     }
   ]
 }

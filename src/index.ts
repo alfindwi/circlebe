@@ -34,8 +34,6 @@ app.get("/", (req, res) => {
 app.use("/api/v1", routerV1)
 
 
-
-
 app.listen(port, () => {
     console.log(`berjalan di port ${port}`)
 })
