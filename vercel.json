@@ -13,7 +13,7 @@
         "dest": "src/index.ts"
       }
     ],
-    "rewirites": [
+    "rewrites": [
       {
         "source": "/(.*)",
         "destination": "/"
