@@ -117,9 +117,7 @@ class ThreadController {
           if (!user) {
               return res.status(401).json({ message: "User not authenticated" });
           }
-  
-          console.log("Uploaded file:", req.file); // Log file untuk melihat apakah ada
-  
+    
           if (!req.file) {
               return res.status(400).json({ message: "Image file is required" });
           }
