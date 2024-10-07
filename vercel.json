@@ -9,8 +9,8 @@
   ],
   "rewrites": [
     {
-      "source": "src/(.*)", 
-      "destination": "/src/index.ts" 
+      "source": "/(.*)",
+      "destination": "/src/index.ts"  
     }
   ]
 }
