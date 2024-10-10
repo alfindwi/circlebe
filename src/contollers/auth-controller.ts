@@ -4,17 +4,15 @@ import { Request, Response } from "express";
 import { decode } from "jsonwebtoken";
 import authService from "../services/auth-service";
 import { GoogleOAuthCallback } from "../types/oauth/google";
-import { loginSchema, registerSchema } from "../utils/schema/auth-schema";
+import { forgotPasswordSchema, loginSchema, registerSchema, resetPasswordSchema } from "../utils/schema/auth-schema";
 import jwt from "jsonwebtoken";
 import Cookies from "js-cookie";
-
 
 const prisma = new PrismaClient();
 
 class AuthController {
-    
-    async login (req: Request, res: Response) {
-        /*  #swagger.requestBody = {
+  async login(req: Request, res: Response) {
+    /*  #swagger.requestBody = {
             required: true,
             content: {
                 "application/json": {
@@ -25,22 +23,25 @@ class AuthController {
             }
         } 
     */
-        try {
-            const {error, value } = await loginSchema.validate(req.body, {abortEarly: false});
-            if(error) {
-                const errorMessage = error.details.map(detail => detail.message);
-                return res.status(400).json({message: errorMessage})
-            }
+    try {
+      const { error, value } = await loginSchema.validate(req.body, {
+        abortEarly: false,
+      });
+      
+      if (error) {
+        const errorMessage = error.details.map((detail) => detail.message);
+        return res.status(400).json({ message: errorMessage });
+      }
 
-            const users = await authService.login(value);
-        res.json(users);  
-        } catch (error) {
-            res.status(500).json(error)
-        }
+      const users = await authService.login(value);
+      res.json(users);
+    } catch (error) {
+      res.status(500).json(error);
     }
+  }
 
-    async register (req: Request, res: Response) {
-        /*  #swagger.requestBody = {
+  async register(req: Request, res: Response) {
+    /*  #swagger.requestBody = {
             required: true,
             content: {
                 "application/json": {
@@ -51,132 +52,172 @@ class AuthController {
             }
         } 
     */
-        try {
-            const {error, value} = await registerSchema.validate(req.body, {abortEarly: false});
-            
-            if(error) {
-                const errorMessage = error.details.map(detail => detail.message);
-                return res.status(400).json({message: errorMessage})
-            }
-            await authService.register(value);
-            const users = await authService.login(value)
-        res.json(users);  
-        } catch (error) {
-            res.status(500).json(error)
-        }
-    }
+    try {
+      const { error, value } = await registerSchema.validate(req.body, {
+        abortEarly: false,
+      });
 
-    async logout(req: Request, res: Response) {
-        /*  #swagger.requestBody = {
+      if (error) {
+        const errorMessage = error.details.map((detail) => detail.message);
+        return res.status(400).json({ message: errorMessage });
+      }
+      await authService.register(value);
+      const users = await authService.login(value);
+      res.json(users);
+    } catch (error) {
+      res.status(500).json(error);
+    }
+  }
+
+  async forgotPassword(req: Request, res: Response) {
+    /* #swagger.requestBody = {
             required: true,
             content: {
                 "application/json": {
                     schema: {
-                        $ref: "#/components/schemas/logoutDTO"
+                        $ref: "#/components/schemas/ForgotPasswordDTO"
                     }  
                 }
             }
         } 
-        */
-        try {
-            // Mengambil token dari cookies atau authorization header
-            const token = req.cookies.accessToken || req.headers.authorization?.split(' ')[1];
-            
-            // Cek apakah token ada
-            if (!token) {
-                return res.status(400).json({ message: "No token provided" });
-            }
-    
-            // Di sini bisa menambahkan logika untuk menghapus token (misalnya dari database atau blacklist)
-    
-            return res.status(200).json({ message: "Successfully logged out" });
-        } catch (error) {
-            return res.status(500).json({ message: "Logout failed", error });
-        }
+    */
+    try {
+      const { error, value } = await forgotPasswordSchema.validate(req.body, {
+        abortEarly: false,
+      });
+
+      if (error) {
+        const errorMessage = error.details.map((detail: { message: any; }) => detail.message);
+        return res.status(400).json({ message: errorMessage });
+      }
+
+      const message = await authService.forgotPassword(value.email);
+      return res.status(200).json({ message });
+    } catch (err) {
+      return res.status(500).json({ message: "Failed to process forgot password", error: err });
     }
-    
+  }
 
-    async check (req: Request, res: Response) {
-        try {
-            const user = (req as any).user;
-        res.json(user);  
-        } catch (error) {
-            res.status(500).json(error)
-        }
-    }
-
-    async googleOAuth (req: Request, res: Response) {
-        const GOOGLE_OAUTH_URL = process.env.GOOGLE_OAUTH_URL;
-        const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
-        const GOOGLE_CALLBACK_URL = "http%3A//localhost:4000/api/v1/google/callback";
-        const GOOGLE_OAUTH_SCOPES = [
-        "https%3A//www.googleapis.com/auth/userinfo.email",
-        "https%3A//www.googleapis.com/auth/userinfo.profile",
-        ];
-
-        const state = "haifrombackend";
-        const scopes = GOOGLE_OAUTH_SCOPES.join(" ");
-        const GOOGLE_OAUTH_CONSENT_URL = `${GOOGLE_OAUTH_URL}?client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${GOOGLE_CALLBACK_URL}&access_type=offline&response_type=code&state=${state}&scope=${scopes}`;
-        res.redirect(GOOGLE_OAUTH_CONSENT_URL);
-    }
-
-    async googleOAuthCallback (req: Request, res: Response) {
-        const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
-        const GOOGLE_ACCESS_TOKEN_URL = process.env.GOOGLE_ACCESS_TOKEN_URL!;
-        const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
-
-        const code = req.query.code;
-
-        const data = {
-            code,
-            client_id: GOOGLE_CLIENT_ID,
-            client_secret: GOOGLE_CLIENT_SECRET,
-            redirect_uri: "/google/callback",
-            grant_type: "authorization_code",
-        }   
-
-        const response = await axios.post(GOOGLE_ACCESS_TOKEN_URL, data)
-
-        const decodedToken = decode(response.data.id_token) as GoogleOAuthCallback;
-
-        if (!decodedToken) {
-        return res.status(400).json({ message: "Invalid ID token" });
-        }
-
-        const { email, name } = decodedToken;
-
-        const googleUser = await prisma.user.findFirst({
-            where: {
-              email,
-              socialConnection: "GOOGLE",
-            },
-        });
-
-        const secretKey = process.env.JWT_SECRET as string;
-
-        if (!googleUser) {
-            const user = await prisma.user.create(
-                {
-                    data: {
-                        email,
-                        fullName: name,
-                        username: decodedToken.family_name,
-                        socialConnection: "GOOGLE",
-                        image: decodedToken.picture
-                    }
+  async resetPassword(req: Request, res: Response) {
+    /* #swagger.requestBody = {
+            required: true,
+            content: {
+                "application/json": {
+                    schema: {
+                        $ref: "#/components/schemas/ResetPasswordDTO"
+                    }  
                 }
-            );
-            const {passwordUsers, ...userToSign} = user;
-            const token = jwt.sign(userToSign, secretKey);
+            }
+        } 
+    */
+    try {
+      const { error, value } = await resetPasswordSchema.validate(req.body, {
+        abortEarly: false,
+      });
 
-            return res.redirect(`http://localhost:4000?accessToken=${token}`);
-        }
+      if (error) {
+        const errorMessage = error.details.map((detail: { message: any; }) => detail.message);
+        return res.status(400).json({ message: errorMessage });
+      }
 
-        const {passwordUsers, ...userToSign} = googleUser;
-        const token = jwt.sign(userToSign, secretKey);
-
-        res.send(response.data);
+      const message = await authService.resetPassword(value.token, value.passwordUsers);
+      return res.status(200).json({ message });
+    } catch (err) {
+      return res.status(500).json({ message: "Failed to reset password", error: err });
     }
+  }
+  
+
+  async logout(req: Request, res: Response) {
+    try {
+      res.clearCookie('token');
+
+      return res.status(200).json({ message: "Logout successful" });
+    } catch (error) {
+      return res.status(500).json({ message: "Logout failed", error });
+    }
+  }
+
+  async check(req: Request, res: Response) {
+    try {
+      const user = (req as any).user;
+      res.json(user);
+    } catch (error) {
+      res.status(500).json(error);
+    }
+  }
+
+  async googleOAuth(req: Request, res: Response) {
+    const GOOGLE_OAUTH_URL = process.env.GOOGLE_OAUTH_URL;
+    const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+    const GOOGLE_CALLBACK_URL =
+      "http%3A//localhost:4000/api/v1/google/callback";
+    const GOOGLE_OAUTH_SCOPES = [
+      "https%3A//www.googleapis.com/auth/userinfo.email",
+      "https%3A//www.googleapis.com/auth/userinfo.profile",
+    ];
+
+    const state = "haifrombackend";
+    const scopes = GOOGLE_OAUTH_SCOPES.join(" ");
+    const GOOGLE_OAUTH_CONSENT_URL = `${GOOGLE_OAUTH_URL}?client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${GOOGLE_CALLBACK_URL}&access_type=offline&response_type=code&state=${state}&scope=${scopes}`;
+    res.redirect(GOOGLE_OAUTH_CONSENT_URL);
+  }
+
+  async googleOAuthCallback(req: Request, res: Response) {
+    const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+    const GOOGLE_ACCESS_TOKEN_URL = process.env.GOOGLE_ACCESS_TOKEN_URL!;
+    const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+
+    const code = req.query.code;
+
+    const data = {
+      code,
+      client_id: GOOGLE_CLIENT_ID,
+      client_secret: GOOGLE_CLIENT_SECRET,
+      redirect_uri: "/google/callback",
+      grant_type: "authorization_code",
+    };
+
+    const response = await axios.post(GOOGLE_ACCESS_TOKEN_URL, data);
+
+    const decodedToken = decode(response.data.id_token) as GoogleOAuthCallback;
+
+    if (!decodedToken) {
+      return res.status(400).json({ message: "Invalid ID token" });
+    }
+
+    const { email, name } = decodedToken;
+
+    const googleUser = await prisma.user.findFirst({
+      where: {
+        email,
+        socialConnection: "GOOGLE",
+      },
+    });
+
+    const secretKey = process.env.JWT_SECRET as string;
+
+    if (!googleUser) {
+      const user = await prisma.user.create({
+        data: {
+          email,
+          fullName: name,
+          username: decodedToken.family_name,
+          socialConnection: "GOOGLE",
+          image: decodedToken.picture,
+        },
+      });
+      const { passwordUsers, ...userToSign } = user;
+      const token = jwt.sign(userToSign, secretKey);
+
+      return res.redirect(`http://localhost:4000?accessToken=${token}`);
+    }
+
+    const { passwordUsers, ...userToSign } = googleUser;
+    const token = jwt.sign(userToSign, secretKey);
+
+    res.send(response.data);
+  }
 }
 
-export default new AuthController()
+export default new AuthController();

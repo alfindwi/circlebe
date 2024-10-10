@@ -1,6 +1,6 @@
 export type CreateThreadDTO = {
     content: string;
-    image?: string; 
+    image?: string | null; 
     threadId: number
     userId: number;
     fullName: string;

@@ -3,7 +3,7 @@ import followService from "../services/follow-service";
 
 export class FollowController {
   async followUser(req: Request, res: Response) {
-    const userId = (req as any).user.id; 
+    const userId = (req as any).user.id;
     const { followedId } = req.body;
 
     if (!followedId) {
@@ -14,7 +14,13 @@ export class FollowController {
       const follow = await followService.createFollow(userId, followedId);
       return res.status(201).json({ message: "Followed successfully", follow });
     } catch (error) {
-      return res.status(500).json({ error: (error as Error).message || "An error occurred while trying to follow the user." });
+      return res
+        .status(500)
+        .json({
+          error:
+            (error as Error).message ||
+            "An error occurred while trying to follow the user.",
+        });
     }
   }
 
@@ -30,19 +36,31 @@ export class FollowController {
       await followService.unfollowUser(userId, followedId);
       return res.status(200).json({ message: "Unfollowed successfully" });
     } catch (error) {
-      return res.status(500).json({ error: (error as Error).message || "An error occurred while trying to unfollow the user." });
+      return res
+        .status(500)
+        .json({
+          error:
+            (error as Error).message ||
+            "An error occurred while trying to unfollow the user.",
+        });
     }
   }
 
   async getFollowers(req: Request, res: Response) {
     try {
-        const userId = (req as any).user.id; // Ambil user ID dari token
-        const followers = await followService.getFollowers(userId);
-        return res.status(200).json(followers);
+      const userId = (req as any).user.id; // Ambil user ID dari token
+      const followers = await followService.getFollowers(userId);
+      return res.status(200).json(followers);
     } catch (error) {
-        return res.status(500).json({ error: (error as Error).message || "An error occurred while retrieving followers." });
+      return res
+        .status(500)
+        .json({
+          error:
+            (error as Error).message ||
+            "An error occurred while retrieving followers.",
+        });
     }
-}
+  }
 
   async getFollowing(req: Request, res: Response) {
     try {
@@ -50,11 +68,15 @@ export class FollowController {
       const following = await followService.getFollowing(userId);
       return res.status(200).json(following);
     } catch (error) {
-      return res.status(500).json({ error: (error as Error).message || "An error occurred while retrieving following users." });
+      return res
+        .status(500)
+        .json({
+          error:
+            (error as Error).message ||
+            "An error occurred while retrieving following users.",
+        });
     }
   }
 }
-
-
 
 export default new FollowController();

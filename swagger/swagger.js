@@ -60,6 +60,7 @@ const doc = {
             "type": 'integer',
           },
         },
+        "required": ["replyId"]
       },
       RemoveReplyLikeDTO: {
         "type": "object",
@@ -156,6 +157,29 @@ const doc = {
           },
         },
         required: ["fullName"],
+      },
+      ResetPasswordDTO: {
+        type: "object",
+        properties: {
+          token: {
+            type: "string",
+          },
+          passwordUsers: {
+            type: "string",
+            format: "passwordUsers",
+          },
+        },
+        required: ["token", "passwordUsers"],
+      },
+      ForgotPasswordDTO: {
+        type: "object",
+        properties: {
+          email: {
+            type: "string",
+            format: "email",
+          },
+        },
+        required: ["email"],
       },
       LoginDTO: {
         type: "object",
