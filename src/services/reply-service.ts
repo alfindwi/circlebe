@@ -62,6 +62,7 @@ class replyService {
               followers: true,
             },
           },
+          likes: true,
         },
       });
 
@@ -94,7 +95,7 @@ async removeLikeFromReply(replyId: number, userId: number): Promise<void> {
     if (existingLike) {
         await prisma.like.delete({
             where: {
-                id: existingLike.id, // Pastikan id adalah primary key dari like
+                id: existingLike.id,
             },
         });
     }
@@ -107,7 +108,7 @@ async checkIfUserLikedReply(replyId: number, userId: number): Promise<boolean> {
             userId,
         },
     });
-    return !!like; // Mengembalikan true jika like ditemukan
+    return !!like; 
 }
 }
 

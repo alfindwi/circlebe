@@ -88,10 +88,10 @@ class replyController {
 
           if (isLiked) {
               await replyService.removeLikeFromReply(Number(replyId), user.id);
-              return res.status(200).json({ message: "Like removed", isLiked: false });
+              return res.status(200).json({ message: "Reply Like removed", isLiked: false });
           } else {
               await replyService.addLikeToReply(Number(replyId), user.id);
-              return res.status(200).json({ message: "Like added", isLiked: true });
+              return res.status(200).json({ message: "Reply Like added", isLiked: true });
           }
       } catch (error) {
           return res.status(500).json({ message: (error as Error).message });
