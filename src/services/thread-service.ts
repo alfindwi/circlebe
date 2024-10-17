@@ -12,6 +12,9 @@ class threadService {
         replies: true,
         likes: true,
       },
+      orderBy: {
+        createdAt: "desc",
+      }
     });
   }
 
