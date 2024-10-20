@@ -142,33 +142,21 @@ class userService {
       } as customError;
     }
   
-    const updateData: Partial<User> = {};
-  
-    if (data.fullName) {
-      updateData.fullName = data.fullName;
-    }
-  
-    if (data.username) {
-      updateData.username = data.username;
-    }
-  
-    if (data.bio) {
-      updateData.bio = data.bio;
-    }
-  
-    if (data.image) {
-      updateData.image = data.image;
-    }
-  
-    if (data.backgroundImage) {
-      updateData.backgroundImage = data.backgroundImage;
-    }
+    // Construct updateData object to include provided values or keep existing ones
+    const updateData: Partial<User> = {
+      fullName: data.fullName ?? user.fullName, // If not provided, keep current value
+      username: data.username !== undefined ? data.username : user.username, // Accept null or empty string
+      bio: data.bio !== undefined ? data.bio : user.bio, // Accept null or empty string
+      image: data.image || user.image, // Keep current value if not updating
+      backgroundImage: data.backgroundImage || user.backgroundImage, // Keep current value if not updating
+    };
   
     return await prisma.user.update({
       data: updateData,
       where: { id: userId },
     });
   }
+  
   
 
   async deleteUser(id: number): Promise<User | null> {

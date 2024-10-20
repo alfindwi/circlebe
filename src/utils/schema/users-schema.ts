@@ -11,10 +11,11 @@ export const createUserScehma = Joi.object<createUsersDTO>({
 });
 
 export const updateUserScehma = Joi.object<createUsersDTO>({
-  fullName: Joi.string().min(5).max(255).optional(),
-  username: Joi.string().min(5).max(255).optional(),
-  bio: Joi.string().optional(),
-  image: Joi.string().optional(),
-  backgroundImage: Joi.string().optional(),
+  fullName: Joi.string().min(5).max(255).optional().allow(null),
+  username: Joi.string().min(5).max(255).optional().allow(null, ''), // allow null or empty string
+  bio: Joi.string().optional().allow(null, ''), 
+  image: Joi.string().optional().allow(null, ''),
+  backgroundImage: Joi.string().optional().allow(null, ''),
 });
+
 

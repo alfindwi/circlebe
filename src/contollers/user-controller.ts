@@ -144,26 +144,22 @@ class UserController {
   
       let imageUrl, backgroundImageUrl;
   
-      // If image is provided, upload it
       if (image) {
         imageUrl = await cloudinaryService.uploadSingle(image[0]);
       }
   
-      // If background image is provided, upload it
       if (backgroundImage) {
         backgroundImageUrl = await cloudinaryService.uploadSingle(backgroundImage[0]);
       }
   
       const body = {
         ...req.body,
-        ...(imageUrl && { image: imageUrl.secure_url }), // Only add if imageUrl exists
-        ...(backgroundImageUrl && { backgroundImage: backgroundImageUrl.secure_url }), // Only add if backgroundImageUrl exists
+        ...(imageUrl && { image: imageUrl.secure_url }),
+        ...(backgroundImageUrl && { backgroundImage: backgroundImageUrl.secure_url }), 
       };
   
-      // Validate the input data
       const value = await updateUserScehma.validateAsync(body);
   
-      // Update the user with the provided fields
       const updatedUser = await userService.updateUser(userId, value);
   
       res.json(updatedUser);
