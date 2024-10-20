@@ -133,7 +133,7 @@ class userService {
     const user = await prisma.user.findUnique({
       where: { id: userId },
     });
-
+  
     if (!user) {
       throw {
         status: 404,
@@ -141,32 +141,35 @@ class userService {
         code: customErrorCode.USERS_NOT_EXIST,
       } as customError;
     }
-
+  
+    const updateData: Partial<User> = {};
+  
     if (data.fullName) {
-      user.fullName = data.fullName;
+      updateData.fullName = data.fullName;
     }
-
+  
     if (data.username) {
-      user.username = data.username;
+      updateData.username = data.username;
     }
-
+  
     if (data.bio) {
-      user.bio = data.bio;
+      updateData.bio = data.bio;
     }
-
+  
     if (data.image) {
-      user.image = data.image;
+      updateData.image = data.image;
     }
-
+  
     if (data.backgroundImage) {
-      user.backgroundImage = data.backgroundImage;
+      updateData.backgroundImage = data.backgroundImage;
     }
-
+  
     return await prisma.user.update({
-      data: user,
+      data: updateData,
       where: { id: userId },
     });
   }
+  
 
   async deleteUser(id: number): Promise<User | null> {
     const user = await prisma.user.findUnique({

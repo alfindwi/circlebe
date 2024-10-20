@@ -120,53 +120,58 @@ class UserController {
 
   async update(req: Request, res: Response) {
     /*  #swagger.requestBody = {
-            required: true,
-            content: {
-                "multipart/form-data": {
-                    schema: {
-                        $ref: "#/components/schemas/updateUserDTO"
-                    }  
-                }
-            }
-        } 
-        */
+          required: true,
+          content: {
+              "multipart/form-data": {
+                  schema: {
+                      $ref: "#/components/schemas/updateUserDTO"
+                  }  
+              }
+          }
+      } 
+      */
     try {
       const userId = Number(req.params.id);
-
+  
       if (!userId) {
         return res.status(400).json({ message: "User ID is required" });
       }
-
+  
       const { image, backgroundImage } = req.files as {
         image?: Express.Multer.File[];
         backgroundImage?: Express.Multer.File[];
       };
-
-      if (!image || !backgroundImage) {
-        return res
-          .status(400)
-          .json({ message: "Both image and background image are required" });
+  
+      let imageUrl, backgroundImageUrl;
+  
+      // If image is provided, upload it
+      if (image) {
+        imageUrl = await cloudinaryService.uploadSingle(image[0]);
       }
-
-      const imageUrl = await cloudinaryService.uploadSingle(image[0]); 
-      const backgroundImageUrl = await cloudinaryService.uploadSingle(
-        backgroundImage[0]
-      ); 
-
+  
+      // If background image is provided, upload it
+      if (backgroundImage) {
+        backgroundImageUrl = await cloudinaryService.uploadSingle(backgroundImage[0]);
+      }
+  
       const body = {
         ...req.body,
-        image: imageUrl.secure_url,
-        backgroundImage: backgroundImageUrl.secure_url,
+        ...(imageUrl && { image: imageUrl.secure_url }), // Only add if imageUrl exists
+        ...(backgroundImageUrl && { backgroundImage: backgroundImageUrl.secure_url }), // Only add if backgroundImageUrl exists
       };
-
+  
+      // Validate the input data
       const value = await updateUserScehma.validateAsync(body);
+  
+      // Update the user with the provided fields
       const updatedUser = await userService.updateUser(userId, value);
-
+  
       res.json(updatedUser);
     } catch (error) {
       res.status(500).json({ message: "An error occurred", error });
     }
   }
+  
 
   async delete(req: Request, res: Response) {
     try {
