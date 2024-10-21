@@ -115,10 +115,7 @@ class threadService {
     }
   }
 
-  async createThread(
-    data: CreateThreadDTO,
-    user: User
-  ): Promise<Thread | null> {
+  async createThread(data: CreateThreadDTO, user: User): Promise<Thread | null> {
     if (!user) {
       throw {
         code: customErrorCode.THREAD_NOT_EXIST,
@@ -126,15 +123,16 @@ class threadService {
         status: 404,
       } as customError;
     }
-
+  
     return await prisma.thread.create({
       data: {
         content: data.content,
-        image: data.image || null,
+        image: data.image || null,  // Gunakan URL dari Cloudinary
         userId: user.id,
       },
     });
   }
+  
 
   async updateThread(data: UpdateThreadDTO): Promise<Thread | null> {
     const thread = await prisma.thread.findUnique({

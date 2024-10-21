@@ -15,6 +15,7 @@ routerV1.get("/users/:id", userController.findById);
 routerV1.get("/users/email/:email", userController.findByEmail);
 routerV1.get("/users/fullName/:fullName", userController.findByFullname);
 routerV1.get("/users/:userId/thread", threadController.findThreadByUserId);
+routerV1.get('/search', authentication, userController.searchUser)
 routerV1.get("/users/:userId/suggestion", userController.getSuggestion);
 routerV1.post("/users", userController.create);
 routerV1.patch(
@@ -26,7 +27,6 @@ routerV1.patch(
   ]),
   userController.update
 );
-routerV1.delete("/users/:id", userController.delete);
 
 routerV1.post("/auth/login", authController.login);
 routerV1.post("/auth/register", authController.register);

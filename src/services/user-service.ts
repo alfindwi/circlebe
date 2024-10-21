@@ -159,22 +159,18 @@ class userService {
   
   
 
-  async deleteUser(id: number): Promise<User | null> {
-    const user = await prisma.user.findUnique({
-      where: { id },
+  async searchUser(query: string) {
+    const users = await prisma.user.findMany({
+      where: {
+        OR: [
+          {username: {contains: query}},
+          {fullName: {contains: query}},
+          {bio: {contains: query}},
+        ]
+      },
+      take: 10,
     });
-
-    if (!user) {
-      throw {
-        status: 404,
-        message: "User not found!",
-        code: customErrorCode.USERS_NOT_EXIST,
-      } as customError;
-    }
-
-    return await prisma.user.delete({
-      where: { id },
-    });
+    return users;
   }
 }
 

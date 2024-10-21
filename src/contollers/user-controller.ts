@@ -169,26 +169,19 @@ class UserController {
   }
   
 
-  async delete(req: Request, res: Response) {
+  async searchUser (req: Request, res: Response) {
     try {
-      const id = Number(req.params.id);
+      const search = req.query.q as string;
+      const users = await userService.searchUser(search);
 
-      const users = await userService.deleteUser(id);
-
-      if (!users) {
-        throw {
-          status: 404,
-          message: "User not found!",
-          code: customErrorCode.USERS_NOT_EXIST,
-        } as customError;
-      }
-
-      res.json({
-        users,
-        message: "success delete user",
-      });
+      res.json({ users });
     } catch (error) {
-      res.status(500).json(error);
+      console.log(error);
+
+      res.status(500).json({
+        message: "An error occurred while searching users",
+        error,
+      })
     }
   }
 }

@@ -143,32 +143,36 @@ class ThreadController {
                 }
             } 
         */
-    try {
-      const user = (req as any).user;
-      if (!user) {
-        return res.status(401).json({ message: "User not authenticated" });
-      }
-
-      let imageUrl = null;
-
-      if (req.file) {
-        imageUrl = await cloudinaryService.uploadSingle(
-          req.file as Express.Multer.File
-        );
-      }
-
-      const body = {
-        ...req.body,
-        image: imageUrl || null,
-      };
-
-      const value = await createThreadSchema.validateAsync(body);
-      const thread = await threadService.createThread(value, user);
-      res.json(thread);
-    } catch (error) {
-      console.error("Error creating thread:", error);
-      res.status(500).json({ message: (error as Error).message });
-    }
+            try {
+              const user = (req as any).user;
+              if (!user) {
+                return res.status(401).json({ message: "User not authenticated" });
+              }
+          
+              let imageUrl = null;
+          
+              // Proses file jika diunggah
+              if (req.file) {
+                const uploadResult = await cloudinaryService.uploadSingle(req.file as Express.Multer.File);
+                imageUrl = uploadResult.secure_url;  // Ambil hanya URL gambar dari hasil upload Cloudinary
+              }
+          
+              // Gabungkan data body dengan URL gambar (jika ada)
+              const body = {
+                ...req.body,
+                image: imageUrl || null,  // Sertakan URL gambar jika ada
+              };
+          
+              // Validasi menggunakan Joi
+              const value = await createThreadSchema.validateAsync(body);
+          
+              // Buat thread di database
+              const thread = await threadService.createThread(value, user);
+              res.json(thread);
+            } catch (error) {
+              console.error("Error creating thread:", error);
+              res.status(500).json({ message: (error as Error).message });
+            }
   }
 
   async update(req: Request, res: Response) {
